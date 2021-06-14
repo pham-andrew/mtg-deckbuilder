@@ -39,7 +39,7 @@ export default function App() {
         {cards.cards.map((card) => (
           <Paper elevation={3} className="cards">
             <img src={card.imageUrl} alt={card.name}/>
-            <IconButton><AddCircleOutlineIcon /></IconButton>
+            <IconButton size="small"><AddCircleOutlineIcon /></IconButton>
           </Paper>
         ))}
       </div>

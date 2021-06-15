@@ -13,6 +13,8 @@ import Badge from '@material-ui/core/Badge';
 import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
 import Button from '@material-ui/core/Button';
+import Alert from '@material-ui/lab/Alert';
+import Collapse from '@material-ui/core/Collapse';
 
 import MenuIcon from '@material-ui/icons/Menu';
 import SearchIcon from '@material-ui/icons/Search';
@@ -22,6 +24,7 @@ import ViewCarouselIcon from '@material-ui/icons/ViewCarousel';
 import TranslateIcon from '@material-ui/icons/Translate';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
+import CloseIcon from '@material-ui/icons/Close';
 
 import './App.css'
 
@@ -105,6 +108,8 @@ export default function App() {
   const [deck, setDeck] = useState([])
   const [decks, setDecks] = useState([])
   const [lang, setLang] = useState("english")
+  const [alert, setAlert] = React.useState(false);
+  const [alert2, setAlert2] = React.useState(false);
 
   async function fetchCards(){
     let res = await fetch('https://api.magicthegathering.io/v1/cards?setName=kaldheim')
@@ -211,7 +216,22 @@ export default function App() {
           {renderMenu}
         </div>
         {/* Drawer Slide Outs */}
-        <Drawer anchor="right" open={openDeck} onClose={handleDeckClose}>
+        <Drawer anchor="right" open={openDeck} onClose={()=>{handleDeckClose(); setAlert(false)}}>
+          <Collapse in={alert}>
+            <Alert
+              action={
+                <IconButton
+                  color="inherit"
+                  size="small"
+                  onClick={() => {setAlert(false)}}
+                >
+                  <CloseIcon fontSize="inherit" />
+                </IconButton>
+              }
+            >
+              Deck Saved
+            </Alert>
+          </Collapse>
           {deck.map((card) => (
             <Paper elevation={3} className={classes.drawer}>
               <img src={card.card.imageUrl} alt={card.card.name}/>
@@ -220,11 +240,26 @@ export default function App() {
               </IconButton>
             </Paper>
           ))}
-          <Button variant="contained" color="primary" onClick={()=> {setDecks([...decks,{deck}]); setDeck([])}}>Save Deck</Button>
+          <Button variant="contained" color="primary" onClick={()=> {setDecks([...decks,{deck}]); setDeck([]); setAlert(true)}}>Save Deck</Button>
         </Drawer>
-        <Drawer anchor="right" open={openDecks} onClose={handleDecksClose}>
+        <Drawer anchor="right" open={openDecks} onClose={()=>{handleDecksClose(); setAlert2(false)}}>
+          <Collapse in={alert2}>
+            <Alert
+              action={
+                <IconButton
+                  color="inherit"
+                  size="small"
+                  onClick={() => {setAlert2(false);}}
+                >
+                  <CloseIcon fontSize="inherit" />
+                </IconButton>
+              }
+            >
+              Deck Loaded
+            </Alert>
+          </Collapse>
           {decks.map((d) => (
-            <Paper elevation={3} className={classes.drawer} onClick={() => setDeck(d.deck)}>
+            <Paper elevation={3} className={classes.drawer} onClick={() => {setDeck(d.deck); setAlert2(true)}}>
               <img src={d.deck[0].card.imageUrl} alt={d.deck[0].card.name}/>
               <IconButton onClick={() => setDecks(decks.slice(0,deck.indexOf(d)).concat(decks.slice(decks.indexOf(d)+1)))}>
                 <HighlightOffIcon />

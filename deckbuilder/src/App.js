@@ -12,6 +12,7 @@ import InputBase from '@material-ui/core/InputBase';
 import Badge from '@material-ui/core/Badge';
 import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
+import Button from '@material-ui/core/Button';
 
 import MenuIcon from '@material-ui/icons/Menu';
 import SearchIcon from '@material-ui/icons/Search';
@@ -20,6 +21,7 @@ import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 import ViewCarouselIcon from '@material-ui/icons/ViewCarousel';
 import TranslateIcon from '@material-ui/icons/Translate';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
+import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
 
 import './App.css'
 
@@ -101,7 +103,7 @@ const useStyles = makeStyles((theme) => ({
 export default function App() {
   const [cards, setCards] = useState([])
   const [deck, setDeck] = useState([])
-  //const [decks, setDecks] = useState([])
+  const [decks, setDecks] = useState([])
   const [lang, setLang] = useState("english")
 
   async function fetchCards(){
@@ -145,14 +147,17 @@ export default function App() {
     </Menu>
   );
 
-  const [openDeck, setOpenDeck] = useState(false);
-  const handleDeckOpen = () => setOpenDeck(true);
-  const handleDeckClose = () => setOpenDeck(false);
+  const [openDecks, setOpenDecks] = useState(false)
+  const handleDecksOpen = () => setOpenDecks(true)
+  const handleDecksClose = () => setOpenDecks(false)
+
+  const [openDeck, setOpenDeck] = useState(false)
+  const handleDeckOpen = () => setOpenDeck(true)
+  const handleDeckClose = () => setOpenDeck(false)
   
   if(cards.cards && lang==="english")
     return (
       <div>
-
         {/* App Bar */}
         <div className={classes.grow}>
           <AppBar position="static">
@@ -181,27 +186,22 @@ export default function App() {
                 />
               </div>
               <div className={classes.grow} />
-              <div className={classes.sectionDesktop}>
+              <div>
                 <IconButton color="inherit" onClick={handleDeckOpen}>
                   <Badge badgeContent={deck.length} color="secondary">
                     <ViewCarouselIcon />
                   </Badge>
                 </IconButton>
-                <Drawer anchor="right" open={openDeck} onClose={handleDeckClose}>
-                  {deck.map((card) => (
-                    <Paper elevation={3} className={classes.drawer}>
-                      <img src={card.card.imageUrl} alt={card.card.name}/>
-                      <IconButton onClick={() => setDeck(deck.slice(0,deck.indexOf(card)).concat(deck.slice(deck.indexOf(card)+1)))}>
-                        <HighlightOffIcon />
-                      </IconButton>
-                    </Paper>
-                  ))}
-                </Drawer>
+                <IconButton color="inherit" onClick={handleDecksOpen}>
+                  <Badge badgeContent={decks.length} color="secondary">
+                    <LibraryBooksIcon />
+                  </Badge>
+                </IconButton>
                 <IconButton edge="end" onClick={handleProfileMenuOpen} color="inherit">
                   <TranslateIcon />
                 </IconButton>
               </div>
-              <div className={classes.sectionMobile}>
+              <div>
                 <IconButton color="inherit">
                   <MoreIcon />
                 </IconButton>
@@ -210,6 +210,28 @@ export default function App() {
           </AppBar>
           {renderMenu}
         </div>
+        {/* Drawer Slide Outs */}
+        <Drawer anchor="right" open={openDeck} onClose={handleDeckClose}>
+          {deck.map((card) => (
+            <Paper elevation={3} className={classes.drawer}>
+              <img src={card.card.imageUrl} alt={card.card.name}/>
+              <IconButton onClick={() => setDeck(deck.slice(0,deck.indexOf(card)).concat(deck.slice(deck.indexOf(card)+1)))}>
+                <HighlightOffIcon />
+              </IconButton>
+            </Paper>
+          ))}
+          <Button variant="contained" color="primary" onClick={()=> {setDecks([...decks,{deck}]); setDeck([])}}>Save Deck</Button>
+        </Drawer>
+        <Drawer anchor="right" open={openDecks} onClose={handleDecksClose}>
+          {decks.map((d) => (
+            <Paper elevation={3} className={classes.drawer} onClick={() => setDeck(d.deck)}>
+              <img src={d.deck[0].card.imageUrl} alt={d.deck[0].card.name}/>
+              <IconButton onClick={() => setDecks(decks.slice(0,deck.indexOf(d)).concat(decks.slice(decks.indexOf(d)+1)))}>
+                <HighlightOffIcon />
+              </IconButton>
+            </Paper>
+          ))}
+        </Drawer>
         {/* Cards */}
         <div className={classes.root}>
           {cards.cards.map((card) => (
@@ -219,78 +241,6 @@ export default function App() {
             </Paper>
           ))}
         </div>
-      </div>
-    )
-    if(cards.cards && lang==="spanish")
-      return (
-        <div>
-
-          {/* App Bar */}
-          <div className={classes.grow}>
-            <AppBar position="static">
-              <Toolbar>
-                <IconButton
-                  edge="start"
-                  className={classes.menuButton}
-                  color="inherit"
-                  aria-label="open drawer"
-                >
-                  <MenuIcon />
-                </IconButton>
-                <Typography className={classes.title} variant="h6" noWrap>
-                  The Better Deck Builder
-                </Typography>
-                <div className={classes.search}>
-                  <div className={classes.searchIcon}>
-                    <SearchIcon />
-                  </div>
-                  <InputBase
-                    placeholder="Search…"
-                    classes={{
-                      root: classes.inputRoot,
-                      input: classes.inputInput,
-                    }}
-                  />
-                </div>
-                <div className={classes.grow} />
-                <div className={classes.sectionDesktop}>
-                  <IconButton color="inherit" onClick={handleDeckOpen}>
-                    <Badge badgeContent={deck.length} color="secondary">
-                      <ViewCarouselIcon />
-                    </Badge>
-                  </IconButton>
-                  <Drawer anchor="right" open={openDeck} onClose={handleDeckClose}>
-                    {deck.map((card) => (
-                      <Paper elevation={3} className={classes.drawer}>
-                        <img src={card.card.imageUrl} alt={card.card.name}/>
-                        <IconButton onClick={() => setDeck(deck.slice(0,deck.indexOf(card)).concat(deck.slice(deck.indexOf(card)+1)))}>
-                          <HighlightOffIcon />
-                        </IconButton>
-                      </Paper>
-                    ))}
-                  </Drawer>
-                  <IconButton edge="end" onClick={handleProfileMenuOpen} color="inherit">
-                    <TranslateIcon />
-                  </IconButton>
-                </div>
-                <div className={classes.sectionMobile}>
-                  <IconButton color="inherit">
-                    <MoreIcon />
-                  </IconButton>
-                </div>
-              </Toolbar>
-            </AppBar>
-            {renderMenu}
-          </div>
-          {/* Cards */}
-          <div className={classes.root}>
-            {cards.cards.map((card) => (
-              <Paper elevation={3} className="cards">
-                <img src={card.foreignNames[1].imageUrl} alt={card.name}/>
-                <IconButton size="small" onClick={()=>setDeck([...deck,{card}])}><AddCircleOutlineIcon /></IconButton>
-              </Paper>
-            ))}
-          </div>
       </div>
     )
   else

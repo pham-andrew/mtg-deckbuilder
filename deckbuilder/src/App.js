@@ -14,10 +14,10 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
 import MenuIcon from '@material-ui/icons/Menu';
 import SearchIcon from '@material-ui/icons/Search';
-import AccountCircle from '@material-ui/icons/AccountCircle';
 import MoreIcon from '@material-ui/icons/MoreVert';
 import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 import ViewCarouselIcon from '@material-ui/icons/ViewCarousel';
+import TranslateIcon from '@material-ui/icons/Translate';
 import './App.css'
 
 const useStyles = makeStyles((theme) => ({
@@ -28,6 +28,18 @@ const useStyles = makeStyles((theme) => ({
       margin: theme.spacing(1),
       width: theme.spacing(20),
       height: theme.spacing(30),
+    },
+  },
+  drawer: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    '& > *': {
+      margin: theme.spacing(1),
+      width: theme.spacing(10),
+      height: theme.spacing(15),
+    },
+    "&:hover": {
+      backgroundColor: "transparent"
     },
   },
   grow: {
@@ -71,7 +83,6 @@ const useStyles = makeStyles((theme) => ({
   },
   inputInput: {
     padding: theme.spacing(1, 1, 1, 0),
-    // vertical padding + font size from searchIcon
     paddingLeft: `calc(1em + ${theme.spacing(4)}px)`,
     transition: theme.transitions.create('width'),
     width: '100%',
@@ -85,23 +96,17 @@ const useStyles = makeStyles((theme) => ({
       display: 'flex',
     },
   },
-  sectionMobile: {
-    display: 'flex',
-    [theme.breakpoints.up('md')]: {
-      display: 'none',
-    },
-  },
 }));
 
 export default function App() {
   const [cards, setCards] = useState([])
   const [deck, setDeck] = useState([])
+  //const [decks, setDecks] = useState([])
 
   async function fetchCards(){
     let res = await fetch('https://api.magicthegathering.io/v1/cards?setName=kaldheim')
     let json = await res.json()
     setCards(json)
-    console.log(json)
   }
 
   useEffect(() => {
@@ -126,8 +131,8 @@ export default function App() {
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-      <MenuItem onClick={handleMenuClose}>My account</MenuItem>
+      <MenuItem onClick={handleMenuClose}>English</MenuItem>
+      <MenuItem onClick={handleMenuClose}>Spanish</MenuItem>
     </Menu>
   );
 
@@ -175,14 +180,14 @@ export default function App() {
                 </IconButton>
                 <Drawer anchor="right" open={openDeck} onClose={handleDeckClose}>
                   {deck.map((card) => (
-                    <Paper elevation={3} className={classes.root}>
+                    <Paper elevation={3} className={classes.drawer}>
                       <img src={card.card.imageUrl} alt={card.card.name}/>
-                      <IconButton size="small"><HighlightOffIcon /></IconButton>
+                      <IconButton onClick={() => {deck.splice(deck.indexOf(card),1) }}><HighlightOffIcon /></IconButton>
                     </Paper>
                   ))}
                 </Drawer>
                 <IconButton edge="end" onClick={handleProfileMenuOpen} color="inherit">
-                  <AccountCircle />
+                  <TranslateIcon />
                 </IconButton>
               </div>
               <div className={classes.sectionMobile}>

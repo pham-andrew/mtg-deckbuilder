@@ -1,8 +1,8 @@
 import React from 'react';
 import { useEffect, useState } from 'react'
+
 import { fade, makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
-import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import IconButton from '@material-ui/core/IconButton';
 import Drawer from '@material-ui/core/Drawer';
 import AppBar from '@material-ui/core/AppBar';
@@ -12,12 +12,15 @@ import InputBase from '@material-ui/core/InputBase';
 import Badge from '@material-ui/core/Badge';
 import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
+
 import MenuIcon from '@material-ui/icons/Menu';
 import SearchIcon from '@material-ui/icons/Search';
 import MoreIcon from '@material-ui/icons/MoreVert';
 import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 import ViewCarouselIcon from '@material-ui/icons/ViewCarousel';
 import TranslateIcon from '@material-ui/icons/Translate';
+import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
+
 import './App.css'
 
 const useStyles = makeStyles((theme) => ({
@@ -37,9 +40,6 @@ const useStyles = makeStyles((theme) => ({
       margin: theme.spacing(1),
       width: theme.spacing(10),
       height: theme.spacing(15),
-    },
-    "&:hover": {
-      backgroundColor: "transparent"
     },
   },
   grow: {
@@ -178,11 +178,13 @@ export default function App() {
                     <ViewCarouselIcon />
                   </Badge>
                 </IconButton>
-                <Drawer anchor="right" open={openDeck} onClose={handleDeckClose}>
+                <Drawer anchor="right" open={openDeck} onClose={handleDeckClose} transitionDuration={1}>
                   {deck.map((card) => (
                     <Paper elevation={3} className={classes.drawer}>
                       <img src={card.card.imageUrl} alt={card.card.name}/>
-                      <IconButton onClick={() => {deck.splice(deck.indexOf(card),1) }}><HighlightOffIcon /></IconButton>
+                      <IconButton onClick={() => setDeck(deck.slice(0,deck.indexOf(card)).concat(deck.slice(deck.indexOf(card)+1)))}>
+                        <HighlightOffIcon />
+                      </IconButton>
                     </Paper>
                   ))}
                 </Drawer>

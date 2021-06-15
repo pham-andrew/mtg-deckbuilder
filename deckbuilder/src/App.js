@@ -108,8 +108,8 @@ export default function App() {
   const [deck, setDeck] = useState([])
   const [decks, setDecks] = useState([])
   const [lang, setLang] = useState("english")
-  const [alert, setAlert] = React.useState(false);
-  const [alert2, setAlert2] = React.useState(false);
+  const [alert, setAlert] = useState(false);
+  const [alert2, setAlert2] = useState(false);
 
   async function fetchCards(){
     let res = await fetch('https://api.magicthegathering.io/v1/cards?setName=kaldheim')
@@ -159,8 +159,15 @@ export default function App() {
   const [openDeck, setOpenDeck] = useState(false)
   const handleDeckOpen = () => setOpenDeck(true)
   const handleDeckClose = () => setOpenDeck(false)
-  
-  if(cards.cards && lang==="english")
+
+  const getURL = (card) => {
+    if(lang==="english")
+      return card.imageUrl
+    if(lang==="spanish")
+      return card.foreignNames[1].imageUrl
+  };
+
+  if(cards.cards)
     return (
       <div>
         {/* App Bar */}
@@ -271,7 +278,7 @@ export default function App() {
         <div className={classes.root}>
           {cards.cards.map((card) => (
             <Paper elevation={3} className="cards">
-              <img src={card.imageUrl} alt={card.name}/>
+              <img src={getURL(card)} alt={card.name}/>
               <IconButton size="small" onClick={()=>setDeck([...deck,{card}])}><AddCircleOutlineIcon /></IconButton>
             </Paper>
           ))}

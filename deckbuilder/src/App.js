@@ -108,8 +108,8 @@ export default function App() {
   const [deck, setDeck] = useState([])
   const [decks, setDecks] = useState([])
   const [lang, setLang] = useState("english")
-  const [alert, setAlert] = useState(false);
-  const [alert2, setAlert2] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [loaded, setLoaded] = useState(false);
 
   async function fetchCards(){
     let res = await fetch('https://api.magicthegathering.io/v1/cards?setName=kaldheim')
@@ -223,14 +223,14 @@ export default function App() {
           {renderMenu}
         </div>
         {/* Drawer Slide Outs */}
-        <Drawer anchor="right" open={openDeck} onClose={()=>{handleDeckClose(); setAlert(false)}}>
-          <Collapse in={alert}>
+        <Drawer anchor="right" open={openDeck} onClose={()=>{handleDeckClose(); setSaved(false)}}>
+          <Collapse in={saved}>
             <Alert
               action={
                 <IconButton
                   color="inherit"
                   size="small"
-                  onClick={() => {setAlert(false)}}
+                  onClick={() => {setSaved(false)}}
                 >
                   <CloseIcon fontSize="inherit" />
                 </IconButton>
@@ -247,16 +247,16 @@ export default function App() {
               </IconButton>
             </Paper>
           ))}
-          <Button variant="contained" color="primary" onClick={()=> {setDecks([...decks,{deck}]); setDeck([]); setAlert(true)}}>Save Deck</Button>
+          <Button variant="contained" color="primary" onClick={()=> {setDecks([...decks,{deck}]); setDeck([]); setSaved(true)}}>Save Deck</Button>
         </Drawer>
-        <Drawer anchor="right" open={openDecks} onClose={()=>{handleDecksClose(); setAlert2(false)}}>
-          <Collapse in={alert2}>
+        <Drawer anchor="right" open={openDecks} onClose={()=>{handleDecksClose(); setLoaded(false)}}>
+          <Collapse in={loaded}>
             <Alert
               action={
                 <IconButton
                   color="inherit"
                   size="small"
-                  onClick={() => {setAlert2(false);}}
+                  onClick={() => {setLoaded(false);}}
                 >
                   <CloseIcon fontSize="inherit" />
                 </IconButton>
@@ -266,9 +266,9 @@ export default function App() {
             </Alert>
           </Collapse>
           {decks.map((d) => (
-            <Paper elevation={3} className={classes.drawer} onClick={() => {setDeck(d.deck); setAlert2(true)}}>
-              <img src={d.deck[0].card.imageUrl} alt={d.deck[0].card.name}/>
-              <IconButton onClick={() => setDecks(decks.slice(0,deck.indexOf(d)).concat(decks.slice(decks.indexOf(d)+1)))}>
+            <Paper elevation={3} className={classes.drawer}>
+              <img src={d.deck[0].card.imageUrl} alt={d.deck[0].card.name} onClick={() => {setDeck(d.deck); setLoaded(true)}}/>
+              <IconButton onClick={() => setDecks(decks.slice(0,decks.indexOf(d)).concat(decks.slice(decks.indexOf(d)+1)))}>
                 <HighlightOffIcon />
               </IconButton>
             </Paper>

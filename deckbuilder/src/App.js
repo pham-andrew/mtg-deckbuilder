@@ -29,6 +29,8 @@ import TranslateIcon from '@material-ui/icons/Translate';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
 import CloseIcon from '@material-ui/icons/Close';
+import IndeterminateCheckBoxIcon from '@material-ui/icons/IndeterminateCheckBox';
+import AddBoxIcon from '@material-ui/icons/AddBox';
 
 import './App.css'
 
@@ -210,9 +212,12 @@ export default function App() {
   const countDup = () => {
     var c = {}
     for(var i=0;i<deck.length;i++)
-      for(var j=0;j<deck.length;j++)
-        if(deck[i]===deck[j])
-          c[deck[i].card.name]=-~c[deck[i].card.name]
+      if(!c[deck[i].card.name])
+        for(var j=0;j<deck.length;j++)
+          if(deck[i].card.name===deck[j].card.name){
+            c[deck[i].card.name]=-~c[deck[i].card.name]
+            console.log(i + "=" + j)
+          }
     setOcc(c)
   };
   useEffect(() => {
@@ -371,7 +376,10 @@ export default function App() {
                 <Paper elevation={3} className={classes.drawer}>
                   <img src={card.card.imageUrl} alt={card.card.name}/>
                   <IconButton onClick={() => setDeck(deck.slice(0,deck.indexOf(card)).concat(deck.slice(deck.indexOf(card)+1)))}>
-                    <HighlightOffIcon />
+                    <IndeterminateCheckBoxIcon />
+                  </IconButton>
+                  <IconButton onClick={() => setDeck(deck.concat(card))}>
+                    <AddBoxIcon />
                   </IconButton>
                 </Paper>
               </Badge>

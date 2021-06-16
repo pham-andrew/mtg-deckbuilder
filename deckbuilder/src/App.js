@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { fade, makeStyles } from '@material-ui/core/styles';
+
+import { fade, makeStyles, withStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import IconButton from '@material-ui/core/IconButton';
 import Drawer from '@material-ui/core/Drawer';
@@ -11,8 +12,13 @@ import Badge from '@material-ui/core/Badge';
 import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
 import Button from '@material-ui/core/Button';
-import Alert from '@material-ui/lab/Alert';
 import Collapse from '@material-ui/core/Collapse';
+import Dialog from '@material-ui/core/Dialog';
+import MuiDialogTitle from '@material-ui/core/DialogTitle';
+import MuiDialogContent from '@material-ui/core/DialogContent';
+import MuiDialogActions from '@material-ui/core/DialogActions';
+
+import Alert from '@material-ui/lab/Alert';
 
 import MenuIcon from '@material-ui/icons/Menu';
 import SearchIcon from '@material-ui/icons/Search';
@@ -101,6 +107,45 @@ const useStyles = makeStyles((theme) => ({
     },
   },
 }));
+
+//dialog box
+const styles = (theme) => ({
+  root: {
+    margin: 0,
+    padding: theme.spacing(2),
+  },
+  closeButton: {
+    position: 'absolute',
+    right: theme.spacing(1),
+    top: theme.spacing(1),
+    color: theme.palette.grey[500],
+  },
+});
+const DialogTitle = withStyles(styles)((props) => {
+  const { children, classes, onClose, ...other } = props;
+  return (
+    <MuiDialogTitle disableTypography className={classes.root} {...other}>
+      <Typography variant="h6">{children}</Typography>
+      {onClose ? (
+        <IconButton aria-label="close" className={classes.closeButton} onClick={onClose}>
+          <CloseIcon />
+        </IconButton>
+      ) : null}
+    </MuiDialogTitle>
+  );
+});
+const DialogContent = withStyles((theme) => ({
+  root: {
+    padding: theme.spacing(2),
+  },
+}))(MuiDialogContent);
+const DialogActions = withStyles((theme) => ({
+  root: {
+    margin: 0,
+    padding: theme.spacing(1),
+  },
+}))(MuiDialogActions);
+  
 
 //the entire app...
 export default function App() {
@@ -211,10 +256,20 @@ export default function App() {
   const handleDeckOpen = () => setOpenDeck(true)
   const handleDeckClose = () => setOpenDeck(false)
 
+  //dialog
+  const [dialog, setDialog] = useState({});
+  const handleDialogOpen = (n) => {
+    setDialog({...dialog, [n]: true});
+    console.log(dialog)
+  };
+  const handleDialogClose = (n) => {
+    setDialog({...dialog, [n]: false});
+  };
+
   //the page
   if(cards.cards)
     return (
-      <div>
+      <>
         {/* App Bar */}
         <div className={classes.grow}>
           <AppBar position="static">
@@ -356,14 +411,34 @@ export default function App() {
         {/* Cards */}
         <div className={classes.root}>
           {cards.cards.filter(card=>card.imageUrl!==undefined).map((card) => (
-            <Paper elevation={3} className="cards">
-              <img src={getLangURL(card)} alt={card.name}/>
-              <IconButton size="small" onClick={()=>setDeck([...deck,{card}])}><AddCircleOutlineIcon /></IconButton>
-            </Paper>
+            <>
+              {/* Each Card */}
+              <Paper elevation={3} className="cards">
+                <img src={getLangURL(card)} alt={card.name} onClick={()=>handleDialogOpen(card.name)}/>
+                <IconButton size="small" onClick={()=>setDeck([...deck,{card}])}><AddCircleOutlineIcon /></IconButton>
+              </Paper>
+              {/* Each Card's dialog */}
+              <Dialog onClose={()=>handleDialogClose(card.name)} open={dialog[card.name]}>
+                <DialogTitle onClose={()=>handleDialogClose(card.name)}>
+                  {card.name}
+                </DialogTitle>
+                <DialogContent dividers>
+                  <img src={getLangURL(card)} alt={card.name}/>
+                  <Typography gutterBottom>
+                    {card.text}
+                  </Typography>
+                </DialogContent>
+                <DialogActions>
+                  <Button autoFocus onClick={()=>handleDialogClose(card.name)} color="primary">
+                    Close
+                  </Button>
+                </DialogActions>
+              </Dialog>
+            </>
           ))}
         </div>
-      </div>
+      </>
     )
   else
-    return(<div>Loading...</div>)
+    return(<>Loading...</>)
 }

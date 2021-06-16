@@ -353,7 +353,8 @@ export default function App() {
       </form>
         {/* Cards */}
         <div className={classes.root}>
-          {cards.cards.map((card) => (
+          {cards.cards.filter(card => card.imageUrl !== undefined)
+          .map((card) => (
             <Paper elevation={3} className="cards">
               <img src={getURL(card)} alt={card.name}/>
               <IconButton size="small" onClick={()=>setDeck([...deck,{card}])}><AddCircleOutlineIcon /></IconButton>

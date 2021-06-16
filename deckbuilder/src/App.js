@@ -102,6 +102,13 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function App() {
+  const [cards, setCards] = useState([])
+  const [colorChecked, setColor] = useState([])
+  const [typeChecked, setType] = useState([])
+  const [cost, setCost] = useState(0)
+  const [setChecked, setSet] = useState([])
+
+
   const handleColorCheckboxChange = (event) =>{
     let newColor = event.target.id
     let indexOfColor = -1
@@ -128,14 +135,37 @@ export default function App() {
     }
   }
 
+  const handleCostChange = (event) => {
+    setCost(event.target.id)
+  }
+
+  const handleSetChange = (event) => {
+    let newSet = event.target.id
+    let indexOfSet = -1
+    let newSetArray = setChecked
+    if(setChecked.includes(newSet)) {
+      indexOfSet = setChecked.indexOf(newSet)
+      newSetArray.splice(indexOfSet, 1)
+      setSet([...newSetArray])
+    } else {
+      setSet([...setChecked, newSet])
+    }
+  }
+
   const handleSubmit = (e) => {
     e.preventDefault();
     fetchCards();
   }
 
-  const [cards, setCards] = useState([])
-  const [colorChecked, setColor] = useState([])
-  const [typeChecked, setType] = useState([])
+  function resetFilters(e) {
+    Array.from(document.querySelectorAll("input")).forEach(input => (input.checked = false))
+    setColor([])
+    setType([])
+    setCost(0)
+    setSet([])
+ }
+
+
 
   useEffect(() => {
     fetchCards()
@@ -143,17 +173,20 @@ export default function App() {
 
   async function fetchCards(){
     let url = `https://api.magicthegathering.io/v1/cards?gameFormat=standard`
+    if(setChecked.length !== 0) {
+      url = `${url}&set=${setChecked.join('|')}`
+    }
     if (colorChecked.length !== 0) {
       url = `${url}&colors=${colorChecked.join('|')}`
     }
     if (typeChecked.length !== 0){
       url = `${url}&types=${typeChecked.join('|')}`
     }
-    console.log(url)
+    if (cost !== 0) {
+      url = `${url}&cmc=${cost}`
+    }
     let res = await fetch(url)
     let newCards = await res.json()
-    console.log(newCards)
-    console.log(newCards.cards[5].imageUrl)
     setCards(newCards)
   }
 
@@ -211,7 +244,8 @@ export default function App() {
         return card.foreignNames[1].imageUrl
   };
 
-  if(cards.cards)
+  if(cards.cards){
+    let cardsArray = cards.cards;
     return (
       <div>
         {/* App Bar */}
@@ -319,7 +353,7 @@ export default function App() {
           ))}
         </Drawer>
         {/* Filters */}
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} onReset={resetFilters}>
           <div>
             <input type="checkbox" id="Blue" name="Blue" value='blue' onChange={handleColorCheckboxChange}/>
               <label for="Blue">Blue</label>
@@ -349,12 +383,53 @@ export default function App() {
               <label for="Land">Land</label>
             <input type="checkbox" id="Planeswalker" name="Planeswalker" value='Planeswalker' onChange={handleTypeCheckboxChange}/>
               <label for="Planeswalker">Planeswalker</label>
+          </div>
+          <div>
+            <input type="radio" id="1" name="CMC" value="1" onChange={handleCostChange}/>
+              <label for="1">CMC 1</label>
+            <input type="radio" id="2" name="CMC" value="2" onChange={handleCostChange}/>
+              <label for="2">CMC 2</label>
+            <input type="radio" id="3" name="CMC" value="3" onChange={handleCostChange}/>
+              <label for="3">CMC 3</label>
+            <input type="radio" id="4" name="CMC" value="4" onChange={handleCostChange}/>
+              <label for="4">CMC 4</label>
+            <input type="radio" id="5" name="CMC" value="5" onChange={handleCostChange}/>
+              <label for="5">CMC 5</label>
+            <input type="radio" id="6" name="CMC" value="6" onChange={handleCostChange}/>
+              <label for="6">CMC 6</label>
+            <input type="radio" id="7" name="CMC" value="7" onChange={handleCostChange}/>
+              <label for="7">CMC 7</label>
+            <input type="radio" id="8" name="CMC" value="8" onChange={handleCostChange}/>
+              <label for="8">CMC 8</label>
+            <input type="radio" id="9" name="CMC" value="9" onChange={handleCostChange}/>
+              <label for="9">CMC 9</label>
+            <input type="radio" id="12" name="CMC" value="12" onChange={handleCostChange}/>
+              <label for="12">CMC 12</label>
+          </div>
+          <div>
+            <input type="checkbox" id="ELD" name="ELD" value="ELD" onChange={handleSetChange} />
+              <label for="ELD">Throne of Eldraine</label>
+            <input type="checkbox" id="THB" name="THB" value="THB" onChange={handleSetChange} />
+              <label for="THB">Theros Beyond Death</label>
+            <input type="checkbox" id="IKO" name="IKO" value="IKO" onChange={handleSetChange} />
+              <label for="IKO">Ikoria Lair of Behemoths</label>
+            <input type="checkbox" id="M21" name="M21" value="M21" onChange={handleSetChange} />
+              <label for="M21">Core 2021</label>
+            <input type="checkbox" id="ZNR" name="ZNR" value="ZNR" onChange={handleSetChange} />
+              <label for="ZNR">Zendikar Rising</label>
+            <input type="checkbox" id="KHM" name="KHM" value="KHM" onChange={handleSetChange} />
+              <label for="KHM">Kaldheim</label>
+            <input type="checkbox" id="STX" name="STX" value="STX" onChange={handleSetChange} />
+              <label for="STX">Strixhaven</label>
             <input type="submit" value="Search" />
+            <input type="reset" value="Reset Filters"/>
           </div>
         </form>
         {/* Cards */}
         <div className={classes.root}>
-          {cards.cards.filter(card=>card.imageUrl!==undefined).map((card) => (
+          {cardsArray.filter(card=>card.imageUrl!==undefined)
+          .filter((card, index, self) => index === self.findIndex(t=> t.name === card.name))
+          .map((card) => (
             <Paper elevation={3} className="cards">
               <img src={getURL(card)} alt={card.name}/>
               <IconButton size="small" onClick={()=>setDeck([...deck,{card}])}><AddCircleOutlineIcon /></IconButton>
@@ -362,7 +437,7 @@ export default function App() {
           ))}
         </div>
       </div>
-    )
+    )}
   else
     return(<div>Loading...</div>)
 }

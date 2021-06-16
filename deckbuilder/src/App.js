@@ -318,7 +318,7 @@ export default function App() {
   //the page
   if(cards.cards)
     return (
-      <MuiThemeProvider theme={theme}>
+      <>
         {/* App Bar */}
         <div className={classes.grow}>
           <AppBar position="static">
@@ -372,65 +372,67 @@ export default function App() {
           {renderMenu}
         </div>
         {/* Deck Drawer Slide Outs */}
-        <Drawer anchor="right" open={openDeck} onClose={()=>{handleDeckClose(); setSaved(false)}}>
-          <Collapse in={saved}>
-            <Alert
-              action={
-                <IconButton
-                  color="inherit"
-                  size="small"
-                  onClick={() => {setSaved(false)}}
-                  style={{ backgroundColor: 'none' }}
-                >
-                  <CloseIcon fontSize="inherit" />
-                </IconButton>
-              }
-            >
-              Deck Saved
-            </Alert>
-          </Collapse>
-          {deck.map((card) => (
-            <div style={{paddingLeft: "20px", paddingTop: "20px"}}>
-              <Badge badgeContent={occ[card.card.name]} color="secondary" anchorOrigin={{vertical: 'top',horizontal: 'left',}} >
-                <Paper elevation={3} className={classes.drawer}>
-                  <img src={getImgLangURL(card.card)} alt={card.card.name}/>
-                  <IconButton onClick={() => setDeck(deck.slice(0,deck.indexOf(card)).concat(deck.slice(deck.indexOf(card)+1)))}>
-                    <IndeterminateCheckBoxIcon />
+        <MuiThemeProvider theme={theme}>
+          <Drawer anchor="right" open={openDeck} onClose={()=>{handleDeckClose(); setSaved(false)}}>
+            <Collapse in={saved}>
+              <Alert
+                action={
+                  <IconButton
+                    color="inherit"
+                    size="small"
+                    onClick={() => {setSaved(false)}}
+                    style={{ backgroundColor: 'none' }}
+                  >
+                    <CloseIcon fontSize="inherit" />
                   </IconButton>
-                  <IconButton onClick={() => setDeck(deck.concat(card))}>
-                    <AddBoxIcon />
+                }
+              >
+                Deck Saved
+              </Alert>
+            </Collapse>
+            {deck.map((card) => (
+              <div style={{paddingLeft: "20px", paddingTop: "20px"}}>
+                <Badge badgeContent={occ[card.card.name]} color="secondary" anchorOrigin={{vertical: 'top',horizontal: 'left',}} >
+                  <Paper elevation={3} className={classes.drawer}>
+                    <img src={getImgLangURL(card.card)} alt={card.card.name}/>
+                    <IconButton onClick={() => setDeck(deck.slice(0,deck.indexOf(card)).concat(deck.slice(deck.indexOf(card)+1)))}>
+                      <IndeterminateCheckBoxIcon />
+                    </IconButton>
+                    <IconButton onClick={() => setDeck(deck.concat(card))}>
+                      <AddBoxIcon />
+                    </IconButton>
+                  </Paper>
+                </Badge>
+              </div>
+            ))}
+            <Button variant="contained" color="primary" onClick={()=> {setDecks([...decks,{deck}]); setDeck([]); setSaved(true)}}>Save Deck</Button>
+          </Drawer>
+          <Drawer anchor="right" open={openDecks} onClose={()=>{handleDecksClose(); setLoaded(false)}}>
+            <Collapse in={loaded}>
+              <Alert
+                action={
+                  <IconButton
+                    color="inherit"
+                    size="small"
+                    onClick={() => {setLoaded(false);}}
+                  >
+                    <CloseIcon fontSize="inherit" />
                   </IconButton>
-                </Paper>
-              </Badge>
-            </div>
-          ))}
-          <Button variant="contained" color="primary" onClick={()=> {setDecks([...decks,{deck}]); setDeck([]); setSaved(true)}}>Save Deck</Button>
-        </Drawer>
-        <Drawer anchor="right" open={openDecks} onClose={()=>{handleDecksClose(); setLoaded(false)}}>
-          <Collapse in={loaded}>
-            <Alert
-              action={
-                <IconButton
-                  color="inherit"
-                  size="small"
-                  onClick={() => {setLoaded(false);}}
-                >
-                  <CloseIcon fontSize="inherit" />
+                }
+              >
+                Deck Loaded
+              </Alert>
+            </Collapse>
+            {decks.map((d) => (
+              <Paper elevation={3} className={classes.drawer}>
+                <img src={d.deck[0].card.imageUrl} alt={d.deck[0].card.name} onClick={() => {setDeck(d.deck); setLoaded(true)}}/>
+                <IconButton onClick={() => setDecks(decks.slice(0,decks.indexOf(d)).concat(decks.slice(decks.indexOf(d)+1)))}>
+                  <HighlightOffIcon />
                 </IconButton>
-              }
-            >
-              Deck Loaded
-            </Alert>
-          </Collapse>
-          {decks.map((d) => (
-            <Paper elevation={3} className={classes.drawer}>
-              <img src={d.deck[0].card.imageUrl} alt={d.deck[0].card.name} onClick={() => {setDeck(d.deck); setLoaded(true)}}/>
-              <IconButton onClick={() => setDecks(decks.slice(0,decks.indexOf(d)).concat(decks.slice(decks.indexOf(d)+1)))}>
-                <HighlightOffIcon />
-              </IconButton>
-            </Paper>
-          ))}
-        </Drawer>
+              </Paper>
+            ))}
+          </Drawer>
+        </MuiThemeProvider>
         {/* Filters */}
         <form onSubmit={handleSubmit}>
           <div>
@@ -499,7 +501,7 @@ export default function App() {
             </>
           ))}
         </div>
-      </MuiThemeProvider>
+      </>
     )
   else
     return(<>Loading...</>)

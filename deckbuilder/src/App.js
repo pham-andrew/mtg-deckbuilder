@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 
-import { fade, makeStyles, withStyles } from '@material-ui/core/styles';
+import { fade, makeStyles, withStyles, createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import IconButton from '@material-ui/core/IconButton';
 import Drawer from '@material-ui/core/Drawer';
@@ -29,6 +29,8 @@ import TranslateIcon from '@material-ui/icons/Translate';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
 import CloseIcon from '@material-ui/icons/Close';
+import IndeterminateCheckBoxIcon from '@material-ui/icons/IndeterminateCheckBox';
+import AddBoxIcon from '@material-ui/icons/AddBox';
 
 import './App.css'
 
@@ -201,11 +203,24 @@ export default function App() {
   const [colorChecked, setColor] = useState([])
   const [typeChecked, setType] = useState([])
 
-  //deck hooks
+  //deck
+  const [occ, setOcc] = useState({})
   const [deck, setDeck] = useState([])
   const [decks, setDecks] = useState([])
-  const [saved, setSaved] = useState(false);
-  const [loaded, setLoaded] = useState(false);
+  const [saved, setSaved] = useState(false)
+  const [loaded, setLoaded] = useState(false)
+  const countDup = () => {
+    var c = {}
+    for(var i=0;i<deck.length;i++)
+      if(!c[deck[i].card.name])
+        for(var j=0;j<deck.length;j++)
+          if(deck[i].card.name===deck[j].card.name)
+            c[deck[i].card.name]=-~c[deck[i].card.name]
+    setOcc(c)
+  }
+  useEffect(() => {
+    countDup()
+  }, [deck])
 
   //language handling and menus
   const [lang, setLang] = useState("english")
@@ -280,6 +295,26 @@ export default function App() {
     setDialog({...dialog, [n]: false});
   };
 
+  //disable ripple
+  const theme = createMuiTheme({
+    props: {
+      // Name of the component
+      MuiButtonBase: {
+        // The properties to apply
+        disableRipple: true // No more ripple, on the whole application!
+      }
+    },
+    overrides: {
+      MuiIconButton: {
+        root: {
+          '&:hover': {
+            backgroundColor: "transparent"
+          }
+        }
+      }
+    }
+  });
+
   //the page
   if(cards.cards)
     return (
@@ -337,57 +372,67 @@ export default function App() {
           {renderMenu}
         </div>
         {/* Deck Drawer Slide Outs */}
-        <Drawer anchor="right" open={openDeck} onClose={()=>{handleDeckClose(); setSaved(false)}}>
-          <Collapse in={saved}>
-            <Alert
-              action={
-                <IconButton
-                  color="inherit"
-                  size="small"
-                  onClick={() => {setSaved(false)}}
-                >
-                  <CloseIcon fontSize="inherit" />
+        <MuiThemeProvider theme={theme}>
+          <Drawer anchor="right" open={openDeck} onClose={()=>{handleDeckClose(); setSaved(false)}}>
+            <Collapse in={saved}>
+              <Alert
+                action={
+                  <IconButton
+                    color="inherit"
+                    size="small"
+                    onClick={() => {setSaved(false)}}
+                    style={{ backgroundColor: 'none' }}
+                  >
+                    <CloseIcon fontSize="inherit" />
+                  </IconButton>
+                }
+              >
+                Deck Saved
+              </Alert>
+            </Collapse>
+            {deck.map((card) => (
+              <div style={{paddingLeft: "20px", paddingTop: "20px"}}>
+                <Badge badgeContent={occ[card.card.name]} color="secondary" anchorOrigin={{vertical: 'top',horizontal: 'left',}} >
+                  <Paper elevation={3} className={classes.drawer}>
+                    <img src={getImgLangURL(card.card)} alt={card.card.name}/>
+                    <IconButton onClick={() => setDeck(deck.slice(0,deck.indexOf(card)).concat(deck.slice(deck.indexOf(card)+1)))}>
+                      <IndeterminateCheckBoxIcon />
+                    </IconButton>
+                    <IconButton onClick={() => setDeck(deck.concat(card))}>
+                      <AddBoxIcon />
+                    </IconButton>
+                  </Paper>
+                </Badge>
+              </div>
+            ))}
+            <Button variant="contained" color="primary" onClick={()=> {setDecks([...decks,{deck}]); setDeck([]); setSaved(true)}}>Save Deck</Button>
+          </Drawer>
+          <Drawer anchor="right" open={openDecks} onClose={()=>{handleDecksClose(); setLoaded(false)}}>
+            <Collapse in={loaded}>
+              <Alert
+                action={
+                  <IconButton
+                    color="inherit"
+                    size="small"
+                    onClick={() => {setLoaded(false);}}
+                  >
+                    <CloseIcon fontSize="inherit" />
+                  </IconButton>
+                }
+              >
+                Deck Loaded
+              </Alert>
+            </Collapse>
+            {decks.map((d) => (
+              <Paper elevation={3} className={classes.drawer}>
+                <img src={d.deck[0].card.imageUrl} alt={d.deck[0].card.name} onClick={() => {setDeck(d.deck); setLoaded(true)}}/>
+                <IconButton onClick={() => setDecks(decks.slice(0,decks.indexOf(d)).concat(decks.slice(decks.indexOf(d)+1)))}>
+                  <HighlightOffIcon />
                 </IconButton>
-              }
-            >
-              Deck Saved
-            </Alert>
-          </Collapse>
-          {deck.map((card) => (
-            <Paper elevation={3} className={classes.drawer}>
-              <img src={card.card.imageUrl} alt={card.card.name}/>
-              <IconButton onClick={() => setDeck(deck.slice(0,deck.indexOf(card)).concat(deck.slice(deck.indexOf(card)+1)))}>
-                <HighlightOffIcon />
-              </IconButton>
-            </Paper>
-          ))}
-          <Button variant="contained" color="primary" onClick={()=> {setDecks([...decks,{deck}]); setDeck([]); setSaved(true)}}>Save Deck</Button>
-        </Drawer>
-        <Drawer anchor="right" open={openDecks} onClose={()=>{handleDecksClose(); setLoaded(false)}}>
-          <Collapse in={loaded}>
-            <Alert
-              action={
-                <IconButton
-                  color="inherit"
-                  size="small"
-                  onClick={() => {setLoaded(false);}}
-                >
-                  <CloseIcon fontSize="inherit" />
-                </IconButton>
-              }
-            >
-              Deck Loaded
-            </Alert>
-          </Collapse>
-          {decks.map((d) => (
-            <Paper elevation={3} className={classes.drawer}>
-              <img src={d.deck[0].card.imageUrl} alt={d.deck[0].card.name} onClick={() => {setDeck(d.deck); setLoaded(true)}}/>
-              <IconButton onClick={() => setDecks(decks.slice(0,decks.indexOf(d)).concat(decks.slice(decks.indexOf(d)+1)))}>
-                <HighlightOffIcon />
-              </IconButton>
-            </Paper>
-          ))}
-        </Drawer>
+              </Paper>
+            ))}
+          </Drawer>
+        </MuiThemeProvider>
         {/* Filters */}
         <form onSubmit={handleSubmit}>
           <div>
@@ -424,13 +469,18 @@ export default function App() {
         </form>
         {/* Cards */}
         <div className={classes.root}>
-          {cards.cards.filter(card=>card.imageUrl!==undefined).map((card) => (
+          {cards.cards
+          .filter(card=>card.imageUrl!==undefined)
+          //TODO FILTER CARDS WITH DUPLICATE NAMES
+          .map((card) => (
             <>
               {/* Each Card */}
-              <Paper elevation={3} className="cards">
-                <img src={getImgLangURL(card)} alt={card.name} onClick={()=>handleDialogOpen(card.name)}/>
-                <IconButton size="small" onClick={()=>setDeck([...deck,{card}])}><AddCircleOutlineIcon /></IconButton>
-              </Paper>
+              <Badge badgeContent={occ[card.name]} color="secondary">
+                <Paper elevation={3} className="cards">
+                  <img src={getImgLangURL(card)} alt={card.name} onClick={()=>handleDialogOpen(card.name)}/>
+                  <IconButton size="small" onClick={()=>setDeck([...deck,{card}])}><AddCircleOutlineIcon /></IconButton>
+                </Paper>
+              </Badge>
               {/* Each Card's dialog */}
               <Dialog onClose={()=>handleDialogClose(card.name)} open={dialog[card.name]}>
                 <DialogTitle onClose={()=>handleDialogClose(card.name)}>

@@ -328,24 +328,37 @@ export default function App() {
   };
 
   //disable ripple
-    const theme = createMuiTheme({
-      props: {
-        // Name of the component
-        MuiButtonBase: {
-          // The properties to apply
-          disableRipple: true // No more ripple, on the whole application!
-        }
-      },
-      overrides: {
-        MuiIconButton: {
-          root: {
-            '&:hover': {
-              backgroundColor: "transparent"
-            }
+  const theme = createMuiTheme({
+    props: {
+      // Name of the component
+      MuiButtonBase: {
+        // The properties to apply
+        disableRipple: true // No more ripple, on the whole application!
+      }
+    },
+    overrides: {
+      MuiIconButton: {
+        root: {
+          '&:hover': {
+            backgroundColor: "transparent"
           }
         }
       }
-    });
+    }
+  });
+
+  //paper color
+  const getColor = (c) => {
+    if(c[0] === "G")
+      return "lightGreen"
+    if(c[0] === "B")
+      return "lightSlateGray"
+    if(c[0] === "U")
+      return "lightBlue"
+    if(c[0] === "R")
+      return "#ffcccb"
+    
+  }
 
   //the whole app
   if(cards.cards){
@@ -547,7 +560,7 @@ export default function App() {
             <>
               {/* Each Card */}
               <Badge badgeContent={occ[card.name]} color="secondary">
-                <Paper elevation={3} className="cards">
+                <Paper elevation={3} className="cards" style={{backgroundColor: getColor(card.colorIdentity)}}>
                   <img src={getImgLangURL(card)} alt={card.name} onClick={()=>handleDialogOpen(card.name)}/>
                   <IconButton size="small" onClick={()=>setDeck([...deck,{card}])}><AddCircleOutlineIcon /></IconButton>
                 </Paper>

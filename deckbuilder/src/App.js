@@ -137,6 +137,10 @@ export default function App() {
   const [colorChecked, setColor] = useState([])
   const [typeChecked, setType] = useState([])
 
+  useEffect(() => {
+    fetchCards()
+  }, [])
+
   async function fetchCards(){
     let url = `https://api.magicthegathering.io/v1/cards?gameFormat=standard`
     if (colorChecked.length !== 0) {
@@ -158,10 +162,6 @@ export default function App() {
   const [lang, setLang] = useState("english")
   const [saved, setSaved] = useState(false);
   const [loaded, setLoaded] = useState(false);
-
-  useEffect(() => {
-    fetchCards()
-  }, [])
 
   const classes = useStyles();
 
@@ -207,7 +207,8 @@ export default function App() {
     if(lang==="english")
       return card.imageUrl
     if(lang==="spanish")
-      return card.foreignNames[1].imageUrl
+      if(card.foreignNames[1].imageUrl)
+        return card.foreignNames[1].imageUrl
   };
 
   if(cards.cards)
@@ -350,11 +351,10 @@ export default function App() {
               <label for="Planeswalker">Planeswalker</label>
             <input type="submit" value="Search" />
           </div>
-      </form>
+        </form>
         {/* Cards */}
         <div className={classes.root}>
-          {cards.cards.filter(card => card.imageUrl !== undefined)
-          .map((card) => (
+          {cards.cards.filter(card=>card.imageUrl!==undefined).map((card) => (
             <Paper elevation={3} className="cards">
               <img src={getURL(card)} alt={card.name}/>
               <IconButton size="small" onClick={()=>setDeck([...deck,{card}])}><AddCircleOutlineIcon /></IconButton>

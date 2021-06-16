@@ -187,11 +187,9 @@ export default function App() {
       setType([...typeChecked, newType])
     }
   }
-
   const handleCostChange = (event) => {
     setCost(event.target.id)
   }
-
   const handleSetChange = (event) => {
     let newSet = event.target.id
     let indexOfSet = -1
@@ -204,12 +202,10 @@ export default function App() {
       setSet([...setChecked, newSet])
     }
   }
-
   const handleSubmit = (e) => {
     e.preventDefault();
     fetchCards();
   }
-
   function resetFilters(e) {
     Array.from(document.querySelectorAll("input")).forEach(input => (input.checked = false))
     setColor([])
@@ -217,11 +213,9 @@ export default function App() {
     setCost(0)
     setSet([])
  }
-
   useEffect(() => {
     fetchCards()
   }, [])
-
   async function fetchCards(){
     let url = `https://api.magicthegathering.io/v1/cards?gameFormat=standard`
     if(setChecked.length !== 0) {
@@ -353,8 +347,8 @@ export default function App() {
       }
     });
 
+  //the whole app
   if(cards.cards){
-    let cardsArray = cards.cards;
     return (
       <>
         {/* App Bar */}
@@ -580,6 +574,7 @@ export default function App() {
         </div>
       </>
     )
+  }
   else
     return(<>Loading...</>)
 }

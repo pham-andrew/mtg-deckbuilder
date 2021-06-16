@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { fade, makeStyles } from '@material-ui/core/styles';
+
+import { fade, makeStyles, withStyles, createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import IconButton from '@material-ui/core/IconButton';
 import Drawer from '@material-ui/core/Drawer';
@@ -11,8 +12,13 @@ import Badge from '@material-ui/core/Badge';
 import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
 import Button from '@material-ui/core/Button';
-import Alert from '@material-ui/lab/Alert';
 import Collapse from '@material-ui/core/Collapse';
+import Dialog from '@material-ui/core/Dialog';
+import MuiDialogTitle from '@material-ui/core/DialogTitle';
+import MuiDialogContent from '@material-ui/core/DialogContent';
+import MuiDialogActions from '@material-ui/core/DialogActions';
+
+import Alert from '@material-ui/lab/Alert';
 
 import MenuIcon from '@material-ui/icons/Menu';
 import SearchIcon from '@material-ui/icons/Search';
@@ -23,9 +29,12 @@ import TranslateIcon from '@material-ui/icons/Translate';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
 import CloseIcon from '@material-ui/icons/Close';
+import IndeterminateCheckBoxIcon from '@material-ui/icons/IndeterminateCheckBox';
+import AddBoxIcon from '@material-ui/icons/AddBox';
 
 import './App.css'
 
+//styling
 const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
@@ -101,6 +110,46 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+//dialog box
+const styles = (theme) => ({
+  root: {
+    margin: 0,
+    padding: theme.spacing(2),
+  },
+  closeButton: {
+    position: 'absolute',
+    right: theme.spacing(1),
+    top: theme.spacing(1),
+    color: theme.palette.grey[500],
+  },
+});
+const DialogTitle = withStyles(styles)((props) => {
+  const { children, classes, onClose, ...other } = props;
+  return (
+    <MuiDialogTitle disableTypography className={classes.root} {...other}>
+      <Typography variant="h6">{children}</Typography>
+      {onClose ? (
+        <IconButton aria-label="close" className={classes.closeButton} onClick={onClose}>
+          <CloseIcon />
+        </IconButton>
+      ) : null}
+    </MuiDialogTitle>
+  );
+});
+const DialogContent = withStyles((theme) => ({
+  root: {
+    padding: theme.spacing(2),
+  },
+}))(MuiDialogContent);
+const DialogActions = withStyles((theme) => ({
+  root: {
+    margin: 0,
+    padding: theme.spacing(1),
+  },
+}))(MuiDialogActions);
+  
+
+//the entire app...
 export default function App() {
   const [cards, setCards] = useState([])
   const [colorChecked, setColor] = useState([])
@@ -108,7 +157,12 @@ export default function App() {
   const [cost, setCost] = useState(0)
   const [setChecked, setSet] = useState([])
 
+  const classes = useStyles();
+  useEffect(() => {
+    fetchCards()
+  }, [])
 
+  //filter
   const handleColorCheckboxChange = (event) =>{
     let newColor = event.target.id
     let indexOfColor = -1
@@ -121,7 +175,6 @@ export default function App() {
       setColor([...colorChecked, newColor])
     }
   }
-
   const handleTypeCheckboxChange = (event) =>{
     let newType = event.target.id
     let indexOfType = -1
@@ -165,8 +218,6 @@ export default function App() {
     setSet([])
  }
 
-
-
   useEffect(() => {
     fetchCards()
   }, [])
@@ -190,14 +241,27 @@ export default function App() {
     setCards(newCards)
   }
 
+  //deck
+  const [occ, setOcc] = useState({})
   const [deck, setDeck] = useState([])
   const [decks, setDecks] = useState([])
+  const [saved, setSaved] = useState(false)
+  const [loaded, setLoaded] = useState(false)
+  const countDup = () => {
+    var c = {}
+    for(var i=0;i<deck.length;i++)
+      if(!c[deck[i].card.name])
+        for(var j=0;j<deck.length;j++)
+          if(deck[i].card.name===deck[j].card.name)
+            c[deck[i].card.name]=-~c[deck[i].card.name]
+    setOcc(c)
+  }
+  useEffect(() => {
+    countDup()
+  }, [deck])
+
+  //language handling and menus
   const [lang, setLang] = useState("english")
-  const [saved, setSaved] = useState(false);
-  const [loaded, setLoaded] = useState(false);
-
-  const classes = useStyles();
-
   const [anchorEl, setAnchorEl] = React.useState(null);
   const isMenuOpen = Boolean(anchorEl);
   const handleProfileMenuOpen = (event) => {
@@ -206,12 +270,8 @@ export default function App() {
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
-  const handleSpanish = () => {
-    setLang("spanish");
-    handleMenuClose();
-  };
-  const handleEnglish = () => {
-    setLang("english");
+  const handleLang = (l) => {
+    setLang(l);
     handleMenuClose();
   };
   const renderMenu = (
@@ -223,31 +283,80 @@ export default function App() {
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      <MenuItem onClick={handleEnglish}>English</MenuItem>
-      <MenuItem onClick={handleSpanish}>Spanish</MenuItem>
+      <MenuItem onClick={()=>handleLang("english")}>English</MenuItem>
+      <MenuItem onClick={()=>handleLang("spanish")}>Spanish</MenuItem>
+      <MenuItem onClick={()=>handleLang("german")}>German</MenuItem>
     </Menu>
   );
+  const getImgLangURL = (card) => {
+    if(lang==="german" && card.foreignNames && card.foreignNames[0])
+      if(card.foreignNames[0].language === "German")
+        return card.foreignNames[0].imageUrl  
+    if(lang==="spanish" && card.foreignNames && card.foreignNames[1])
+      if(card.foreignNames[1].language === "Spanish")
+        return card.foreignNames[1].imageUrl
+    return card.imageUrl
+  };
+  const getNameLang = (card) => {
+    if(lang==="german" && card.foreignNames && card.foreignNames[0])
+      if(card.foreignNames[0].language === "German")
+        return card.foreignNames[0].name  
+    if(lang==="spanish" && card.foreignNames && card.foreignNames[1])
+      if(card.foreignNames[1].language === "Spanish")
+        return card.foreignNames[1].name
+    return card.name
+  };
+  const getTextLang = (card) => {
+    if(lang==="german" && card.foreignNames && card.foreignNames[0])
+      if(card.foreignNames[0].language === "German")
+        return card.foreignNames[0].text  
+    if(lang==="spanish" && card.foreignNames && card.foreignNames[1])
+      if(card.foreignNames[1].language === "Spanish")
+        return card.foreignNames[1].text
+    return card.text
+  };
 
+  //slide out drawer hooks
   const [openDecks, setOpenDecks] = useState(false)
   const handleDecksOpen = () => setOpenDecks(true)
   const handleDecksClose = () => setOpenDecks(false)
-
   const [openDeck, setOpenDeck] = useState(false)
   const handleDeckOpen = () => setOpenDeck(true)
   const handleDeckClose = () => setOpenDeck(false)
 
-  const getURL = (card) => {
-    if(lang==="english")
-      return card.imageUrl
-    if(lang==="spanish")
-      if(card.foreignNames[1].imageUrl)
-        return card.foreignNames[1].imageUrl
+  //dialog
+  const [dialog, setDialog] = useState({});
+  const handleDialogOpen = (n) => {
+    setDialog({...dialog, [n]: true});
   };
+  const handleDialogClose = (n) => {
+    setDialog({...dialog, [n]: false});
+  };
+
+  //disable ripple
+    const theme = createMuiTheme({
+      props: {
+        // Name of the component
+        MuiButtonBase: {
+          // The properties to apply
+          disableRipple: true // No more ripple, on the whole application!
+        }
+      },
+      overrides: {
+        MuiIconButton: {
+          root: {
+            '&:hover': {
+              backgroundColor: "transparent"
+            }
+          }
+        }
+      }
+    });
 
   if(cards.cards){
     let cardsArray = cards.cards;
     return (
-      <div>
+      <>
         {/* App Bar */}
         <div className={classes.grow}>
           <AppBar position="static">
@@ -300,58 +409,68 @@ export default function App() {
           </AppBar>
           {renderMenu}
         </div>
-        {/* Drawer Slide Outs */}
-        <Drawer anchor="right" open={openDeck} onClose={()=>{handleDeckClose(); setSaved(false)}}>
-          <Collapse in={saved}>
-            <Alert
-              action={
-                <IconButton
-                  color="inherit"
-                  size="small"
-                  onClick={() => {setSaved(false)}}
-                >
-                  <CloseIcon fontSize="inherit" />
+        {/* Deck Drawer Slide Outs */}
+        <MuiThemeProvider theme={theme}>
+          <Drawer anchor="right" open={openDeck} onClose={()=>{handleDeckClose(); setSaved(false)}}>
+            <Collapse in={saved}>
+              <Alert
+                action={
+                  <IconButton
+                    color="inherit"
+                    size="small"
+                    onClick={() => {setSaved(false)}}
+                    style={{ backgroundColor: 'none' }}
+                  >
+                    <CloseIcon fontSize="inherit" />
+                  </IconButton>
+                }
+              >
+                Deck Saved
+              </Alert>
+            </Collapse>
+            {deck.map((card) => (
+              <div style={{paddingLeft: "20px", paddingTop: "20px"}}>
+                <Badge badgeContent={occ[card.card.name]} color="secondary" anchorOrigin={{vertical: 'top',horizontal: 'left',}} >
+                  <Paper elevation={3} className={classes.drawer}>
+                    <img src={getImgLangURL(card.card)} alt={card.card.name}/>
+                    <IconButton onClick={() => setDeck(deck.slice(0,deck.indexOf(card)).concat(deck.slice(deck.indexOf(card)+1)))}>
+                      <IndeterminateCheckBoxIcon />
+                    </IconButton>
+                    <IconButton onClick={() => setDeck(deck.concat(card))}>
+                      <AddBoxIcon />
+                    </IconButton>
+                  </Paper>
+                </Badge>
+              </div>
+            ))}
+            <Button variant="contained" color="primary" onClick={()=> {setDecks([...decks,{deck}]); setDeck([]); setSaved(true)}}>Save Deck</Button>
+          </Drawer>
+          <Drawer anchor="right" open={openDecks} onClose={()=>{handleDecksClose(); setLoaded(false)}}>
+            <Collapse in={loaded}>
+              <Alert
+                action={
+                  <IconButton
+                    color="inherit"
+                    size="small"
+                    onClick={() => {setLoaded(false);}}
+                  >
+                    <CloseIcon fontSize="inherit" />
+                  </IconButton>
+                }
+              >
+                Deck Loaded
+              </Alert>
+            </Collapse>
+            {decks.map((d) => (
+              <Paper elevation={3} className={classes.drawer}>
+                <img src={d.deck[0].card.imageUrl} alt={d.deck[0].card.name} onClick={() => {setDeck(d.deck); setLoaded(true)}}/>
+                <IconButton onClick={() => setDecks(decks.slice(0,decks.indexOf(d)).concat(decks.slice(decks.indexOf(d)+1)))}>
+                  <HighlightOffIcon />
                 </IconButton>
-              }
-            >
-              Deck Saved
-            </Alert>
-          </Collapse>
-          {deck.map((card) => (
-            <Paper elevation={3} className={classes.drawer}>
-              <img src={card.card.imageUrl} alt={card.card.name}/>
-              <IconButton onClick={() => setDeck(deck.slice(0,deck.indexOf(card)).concat(deck.slice(deck.indexOf(card)+1)))}>
-                <HighlightOffIcon />
-              </IconButton>
-            </Paper>
-          ))}
-          <Button variant="contained" color="primary" onClick={()=> {setDecks([...decks,{deck}]); setDeck([]); setSaved(true)}}>Save Deck</Button>
-        </Drawer>
-        <Drawer anchor="right" open={openDecks} onClose={()=>{handleDecksClose(); setLoaded(false)}}>
-          <Collapse in={loaded}>
-            <Alert
-              action={
-                <IconButton
-                  color="inherit"
-                  size="small"
-                  onClick={() => {setLoaded(false);}}
-                >
-                  <CloseIcon fontSize="inherit" />
-                </IconButton>
-              }
-            >
-              Deck Loaded
-            </Alert>
-          </Collapse>
-          {decks.map((d) => (
-            <Paper elevation={3} className={classes.drawer}>
-              <img src={d.deck[0].card.imageUrl} alt={d.deck[0].card.name} onClick={() => {setDeck(d.deck); setLoaded(true)}}/>
-              <IconButton onClick={() => setDecks(decks.slice(0,decks.indexOf(d)).concat(decks.slice(decks.indexOf(d)+1)))}>
-                <HighlightOffIcon />
-              </IconButton>
-            </Paper>
-          ))}
-        </Drawer>
+              </Paper>
+            ))}
+          </Drawer>
+        </MuiThemeProvider>
         {/* Filters */}
         <form onSubmit={handleSubmit} onReset={resetFilters}>
           <div>
@@ -427,17 +546,40 @@ export default function App() {
         </form>
         {/* Cards */}
         <div className={classes.root}>
-          {cardsArray.filter(card=>card.imageUrl!==undefined)
+          {cards.cards
+          .filter(card=>card.imageUrl!==undefined)
           .filter((card, index, self) => index === self.findIndex(t=> t.name === card.name))
           .map((card) => (
-            <Paper elevation={3} className="cards">
-              <img src={getURL(card)} alt={card.name}/>
-              <IconButton size="small" onClick={()=>setDeck([...deck,{card}])}><AddCircleOutlineIcon /></IconButton>
-            </Paper>
+            <>
+              {/* Each Card */}
+              <Badge badgeContent={occ[card.name]} color="secondary">
+                <Paper elevation={3} className="cards">
+                  <img src={getImgLangURL(card)} alt={card.name} onClick={()=>handleDialogOpen(card.name)}/>
+                  <IconButton size="small" onClick={()=>setDeck([...deck,{card}])}><AddCircleOutlineIcon /></IconButton>
+                </Paper>
+              </Badge>
+              {/* Each Card's dialog */}
+              <Dialog onClose={()=>handleDialogClose(card.name)} open={dialog[card.name]}>
+                <DialogTitle onClose={()=>handleDialogClose(card.name)}>
+                  {getNameLang(card)}
+                </DialogTitle>
+                <DialogContent dividers>
+                  <img src={getImgLangURL(card)} alt={card.name}/>
+                  <Typography gutterBottom>
+                    {getTextLang(card)}
+                  </Typography>
+                </DialogContent>
+                <DialogActions>
+                  <Button autoFocus onClick={()=>handleDialogClose(card.name)} color="primary">
+                    Close
+                  </Button>
+                </DialogActions>
+              </Dialog>
+            </>
           ))}
         </div>
-      </div>
-    )}
+      </>
+    )
   else
-    return(<div>Loading...</div>)
+    return(<>Loading...</>)
 }

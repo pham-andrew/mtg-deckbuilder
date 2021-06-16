@@ -194,10 +194,10 @@ export default function App() {
     </Menu>
   );
   const getLangURL = (card) => {
-    if(lang==="german" && card.foreignNames !== undefined)
-      if(card.foreignNames[1].language === "German")
-        return card.foreignNames[1].imageUrl
-    if(lang==="spanish" && card.foreignNames !== undefined)
+    if(lang==="german" && card.foreignNames && card.foreignNames[0])
+      if(card.foreignNames[0].language === "German")
+        return card.foreignNames[0].imageUrl  
+    if(lang==="spanish" && card.foreignNames && card.foreignNames[1])
       if(card.foreignNames[1].language === "Spanish")
         return card.foreignNames[1].imageUrl
     return card.imageUrl

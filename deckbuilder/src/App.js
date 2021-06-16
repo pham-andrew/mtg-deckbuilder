@@ -173,12 +173,8 @@ export default function App() {
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
-  const handleSpanish = () => {
-    setLang("spanish");
-    handleMenuClose();
-  };
-  const handleEnglish = () => {
-    setLang("english");
+  const handleLang = (l) => {
+    setLang(l);
     handleMenuClose();
   };
   const renderMenu = (
@@ -190,8 +186,9 @@ export default function App() {
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      <MenuItem onClick={handleEnglish}>English</MenuItem>
-      <MenuItem onClick={handleSpanish}>Spanish</MenuItem>
+      <MenuItem onClick={()=>handleLang("english")}>English</MenuItem>
+      <MenuItem onClick={()=>handleLang("spanish")}>Spanish</MenuItem>
+      <MenuItem onClick={()=>handleLang("german")}>German</MenuItem>
     </Menu>
   );
 
@@ -203,12 +200,14 @@ export default function App() {
   const handleDeckOpen = () => setOpenDeck(true)
   const handleDeckClose = () => setOpenDeck(false)
 
-  const getURL = (card) => {
-    if(lang==="english")
-      return card.imageUrl
-    if(lang==="spanish")
-      if(card.foreignNames[1].imageUrl)
+  const getLangURL = (card) => {
+    if(lang==="german" && card.foreignNames !== undefined)
+      if(card.foreignNames[1].language === "German")
         return card.foreignNames[1].imageUrl
+    if(lang==="spanish" && card.foreignNames !== undefined)
+      if(card.foreignNames[1].language === "Spanish")
+        return card.foreignNames[1].imageUrl
+    return card.imageUrl
   };
 
   if(cards.cards)
@@ -356,7 +355,7 @@ export default function App() {
         <div className={classes.root}>
           {cards.cards.filter(card=>card.imageUrl!==undefined).map((card) => (
             <Paper elevation={3} className="cards">
-              <img src={getURL(card)} alt={card.name}/>
+              <img src={getLangURL(card)} alt={card.name}/>
               <IconButton size="small" onClick={()=>setDeck([...deck,{card}])}><AddCircleOutlineIcon /></IconButton>
             </Paper>
           ))}

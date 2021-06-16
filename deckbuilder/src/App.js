@@ -163,15 +163,12 @@ export default function App() {
     if (typeChecked.length !== 0){
       url = `${url}&types=${typeChecked.join('|')}`
     }
-    console.log(url)
     let res = await fetch(url)
     let newCards = await res.json()
-    console.log(newCards)
-    console.log(newCards.cards[5].imageUrl)
     setCards(newCards)
   }
 
-  //filter functionality and checkboxes
+  //filter
   const handleColorCheckboxChange = (event) =>{
     let newColor = event.target.id
     let indexOfColor = -1
@@ -238,7 +235,7 @@ export default function App() {
       <MenuItem onClick={()=>handleLang("german")}>German</MenuItem>
     </Menu>
   );
-  const getLangURL = (card) => {
+  const getImgLangURL = (card) => {
     if(lang==="german" && card.foreignNames && card.foreignNames[0])
       if(card.foreignNames[0].language === "German")
         return card.foreignNames[0].imageUrl  
@@ -246,6 +243,24 @@ export default function App() {
       if(card.foreignNames[1].language === "Spanish")
         return card.foreignNames[1].imageUrl
     return card.imageUrl
+  };
+  const getNameLang = (card) => {
+    if(lang==="german" && card.foreignNames && card.foreignNames[0])
+      if(card.foreignNames[0].language === "German")
+        return card.foreignNames[0].name  
+    if(lang==="spanish" && card.foreignNames && card.foreignNames[1])
+      if(card.foreignNames[1].language === "Spanish")
+        return card.foreignNames[1].name
+    return card.name
+  };
+  const getTextLang = (card) => {
+    if(lang==="german" && card.foreignNames && card.foreignNames[0])
+      if(card.foreignNames[0].language === "German")
+        return card.foreignNames[0].text  
+    if(lang==="spanish" && card.foreignNames && card.foreignNames[1])
+      if(card.foreignNames[1].language === "Spanish")
+        return card.foreignNames[1].text
+    return card.text
   };
 
   //slide out drawer hooks
@@ -260,7 +275,6 @@ export default function App() {
   const [dialog, setDialog] = useState({});
   const handleDialogOpen = (n) => {
     setDialog({...dialog, [n]: true});
-    console.log(dialog)
   };
   const handleDialogClose = (n) => {
     setDialog({...dialog, [n]: false});
@@ -414,18 +428,18 @@ export default function App() {
             <>
               {/* Each Card */}
               <Paper elevation={3} className="cards">
-                <img src={getLangURL(card)} alt={card.name} onClick={()=>handleDialogOpen(card.name)}/>
+                <img src={getImgLangURL(card)} alt={card.name} onClick={()=>handleDialogOpen(card.name)}/>
                 <IconButton size="small" onClick={()=>setDeck([...deck,{card}])}><AddCircleOutlineIcon /></IconButton>
               </Paper>
               {/* Each Card's dialog */}
               <Dialog onClose={()=>handleDialogClose(card.name)} open={dialog[card.name]}>
                 <DialogTitle onClose={()=>handleDialogClose(card.name)}>
-                  {card.name}
+                  {getNameLang(card)}
                 </DialogTitle>
                 <DialogContent dividers>
-                  <img src={getLangURL(card)} alt={card.name}/>
+                  <img src={getImgLangURL(card)} alt={card.name}/>
                   <Typography gutterBottom>
-                    {card.text}
+                    {getTextLang(card)}
                   </Typography>
                 </DialogContent>
                 <DialogActions>

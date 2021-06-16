@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 
-import { fade, makeStyles, withStyles } from '@material-ui/core/styles';
+import { fade, makeStyles, withStyles, createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import IconButton from '@material-ui/core/IconButton';
 import Drawer from '@material-ui/core/Drawer';
@@ -207,19 +207,17 @@ export default function App() {
   const [occ, setOcc] = useState({})
   const [deck, setDeck] = useState([])
   const [decks, setDecks] = useState([])
-  const [saved, setSaved] = useState(false);
-  const [loaded, setLoaded] = useState(false);
+  const [saved, setSaved] = useState(false)
+  const [loaded, setLoaded] = useState(false)
   const countDup = () => {
     var c = {}
     for(var i=0;i<deck.length;i++)
       if(!c[deck[i].card.name])
         for(var j=0;j<deck.length;j++)
-          if(deck[i].card.name===deck[j].card.name){
+          if(deck[i].card.name===deck[j].card.name)
             c[deck[i].card.name]=-~c[deck[i].card.name]
-            console.log(i + "=" + j)
-          }
     setOcc(c)
-  };
+  }
   useEffect(() => {
     countDup()
   }, [deck])
@@ -297,10 +295,30 @@ export default function App() {
     setDialog({...dialog, [n]: false});
   };
 
+  //disable ripple
+  const theme = createMuiTheme({
+    props: {
+      // Name of the component
+      MuiButtonBase: {
+        // The properties to apply
+        disableRipple: true // No more ripple, on the whole application!
+      }
+    },
+    overrides: {
+      MuiIconButton: {
+        root: {
+          '&:hover': {
+            backgroundColor: "transparent"
+          }
+        }
+      }
+    }
+  });
+
   //the page
   if(cards.cards)
     return (
-      <>
+      <MuiThemeProvider theme={theme}>
         {/* App Bar */}
         <div className={classes.grow}>
           <AppBar position="static">
@@ -362,6 +380,7 @@ export default function App() {
                   color="inherit"
                   size="small"
                   onClick={() => {setSaved(false)}}
+                  style={{ backgroundColor: 'none' }}
                 >
                   <CloseIcon fontSize="inherit" />
                 </IconButton>
@@ -374,7 +393,7 @@ export default function App() {
             <div style={{paddingLeft: "20px", paddingTop: "20px"}}>
               <Badge badgeContent={occ[card.card.name]} color="secondary" anchorOrigin={{vertical: 'top',horizontal: 'left',}} >
                 <Paper elevation={3} className={classes.drawer}>
-                  <img src={card.card.imageUrl} alt={card.card.name}/>
+                  <img src={getImgLangURL(card.card)} alt={card.card.name}/>
                   <IconButton onClick={() => setDeck(deck.slice(0,deck.indexOf(card)).concat(deck.slice(deck.indexOf(card)+1)))}>
                     <IndeterminateCheckBoxIcon />
                   </IconButton>
@@ -480,7 +499,7 @@ export default function App() {
             </>
           ))}
         </div>
-      </>
+      </MuiThemeProvider>
     )
   else
     return(<>Loading...</>)

@@ -366,12 +366,16 @@ export default function App() {
             </Alert>
           </Collapse>
           {deck.map((card) => (
-            <Paper elevation={3} className={classes.drawer}>
-              <img src={card.card.imageUrl} alt={card.card.name}/>
-              <IconButton onClick={() => setDeck(deck.slice(0,deck.indexOf(card)).concat(deck.slice(deck.indexOf(card)+1)))}>
-                <HighlightOffIcon />
-              </IconButton>
-            </Paper>
+            <div style={{paddingLeft: "20px", paddingTop: "20px"}}>
+              <Badge badgeContent={occ[card.card.name]} color="secondary" anchorOrigin={{vertical: 'top',horizontal: 'left',}} >
+                <Paper elevation={3} className={classes.drawer}>
+                  <img src={card.card.imageUrl} alt={card.card.name}/>
+                  <IconButton onClick={() => setDeck(deck.slice(0,deck.indexOf(card)).concat(deck.slice(deck.indexOf(card)+1)))}>
+                    <HighlightOffIcon />
+                  </IconButton>
+                </Paper>
+              </Badge>
+            </div>
           ))}
           <Button variant="contained" color="primary" onClick={()=> {setDecks([...decks,{deck}]); setDeck([]); setSaved(true)}}>Save Deck</Button>
         </Drawer>
@@ -436,7 +440,10 @@ export default function App() {
         </form>
         {/* Cards */}
         <div className={classes.root}>
-          {cards.cards.filter(card=>card.imageUrl!==undefined).map((card) => (
+          {cards.cards
+          .filter(card=>card.imageUrl!==undefined)
+          //TODO FILTER CARDS WITH DUPLICATE NAMES
+          .map((card) => (
             <>
               {/* Each Card */}
               <Badge badgeContent={occ[card.name]} color="secondary">

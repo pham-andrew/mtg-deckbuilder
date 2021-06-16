@@ -201,11 +201,23 @@ export default function App() {
   const [colorChecked, setColor] = useState([])
   const [typeChecked, setType] = useState([])
 
-  //deck hooks
+  //deck
+  const [occ, setOcc] = useState({})
   const [deck, setDeck] = useState([])
   const [decks, setDecks] = useState([])
   const [saved, setSaved] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const countDup = () => {
+    var c = {}
+    for(var i=0;i<deck.length;i++)
+      for(var j=0;j<deck.length;j++)
+        if(deck[i]===deck[j])
+          c[deck[i].card.name]=-~c[deck[i].card.name]
+    setOcc(c)
+  };
+  useEffect(() => {
+    countDup()
+  }, [deck])
 
   //language handling and menus
   const [lang, setLang] = useState("english")
@@ -427,10 +439,12 @@ export default function App() {
           {cards.cards.filter(card=>card.imageUrl!==undefined).map((card) => (
             <>
               {/* Each Card */}
-              <Paper elevation={3} className="cards">
-                <img src={getImgLangURL(card)} alt={card.name} onClick={()=>handleDialogOpen(card.name)}/>
-                <IconButton size="small" onClick={()=>setDeck([...deck,{card}])}><AddCircleOutlineIcon /></IconButton>
-              </Paper>
+              <Badge badgeContent={occ[card.name]} color="secondary">
+                <Paper elevation={3} className="cards">
+                  <img src={getImgLangURL(card)} alt={card.name} onClick={()=>handleDialogOpen(card.name)}/>
+                  <IconButton size="small" onClick={()=>setDeck([...deck,{card}])}><AddCircleOutlineIcon /></IconButton>
+                </Paper>
+              </Badge>
               {/* Each Card's dialog */}
               <Dialog onClose={()=>handleDialogClose(card.name)} open={dialog[card.name]}>
                 <DialogTitle onClose={()=>handleDialogClose(card.name)}>

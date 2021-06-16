@@ -26,6 +26,7 @@ import CloseIcon from '@material-ui/icons/Close';
 
 import './App.css'
 
+//styling
 const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
@@ -101,46 +102,14 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+//the entire app...
 export default function App() {
-  const handleColorCheckboxChange = (event) =>{
-    let newColor = event.target.id
-    let indexOfColor = -1
-    let newColorArray = colorChecked
-    if(colorChecked.includes(newColor)){
-      indexOfColor = colorChecked.indexOf(newColor)
-      newColorArray.splice(indexOfColor, 1)
-      setColor([...newColorArray])
-    }else {
-      setColor([...colorChecked, newColor])
-    }
-  }
-
-  const handleTypeCheckboxChange = (event) =>{
-    let newType = event.target.id
-    let indexOfType = -1
-    let newTypeArray = typeChecked
-    if(typeChecked.includes(newType)){
-      indexOfType = typeChecked.indexOf(newType)
-      newTypeArray.splice(indexOfType, 1)
-      setType([...newTypeArray])
-    }else {
-      setType([...typeChecked, newType])
-    }
-  }
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    fetchCards();
-  }
-
-  const [cards, setCards] = useState([])
-  const [colorChecked, setColor] = useState([])
-  const [typeChecked, setType] = useState([])
-
+  const classes = useStyles();
   useEffect(() => {
     fetchCards()
   }, [])
 
+  //fetch
   async function fetchCards(){
     let url = `https://api.magicthegathering.io/v1/cards?gameFormat=standard`
     if (colorChecked.length !== 0) {
@@ -157,14 +126,47 @@ export default function App() {
     setCards(newCards)
   }
 
+  //filter functionality and checkboxes
+  const handleColorCheckboxChange = (event) =>{
+    let newColor = event.target.id
+    let indexOfColor = -1
+    let newColorArray = colorChecked
+    if(colorChecked.includes(newColor)){
+      indexOfColor = colorChecked.indexOf(newColor)
+      newColorArray.splice(indexOfColor, 1)
+      setColor([...newColorArray])
+    }else {
+      setColor([...colorChecked, newColor])
+    }
+  }
+  const handleTypeCheckboxChange = (event) =>{
+    let newType = event.target.id
+    let indexOfType = -1
+    let newTypeArray = typeChecked
+    if(typeChecked.includes(newType)){
+      indexOfType = typeChecked.indexOf(newType)
+      newTypeArray.splice(indexOfType, 1)
+      setType([...newTypeArray])
+    }else {
+      setType([...typeChecked, newType])
+    }
+  }
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    fetchCards();
+  }
+  const [cards, setCards] = useState([])
+  const [colorChecked, setColor] = useState([])
+  const [typeChecked, setType] = useState([])
+
+  //deck hooks
   const [deck, setDeck] = useState([])
   const [decks, setDecks] = useState([])
-  const [lang, setLang] = useState("english")
   const [saved, setSaved] = useState(false);
   const [loaded, setLoaded] = useState(false);
 
-  const classes = useStyles();
-
+  //language handling and menus
+  const [lang, setLang] = useState("english")
   const [anchorEl, setAnchorEl] = React.useState(null);
   const isMenuOpen = Boolean(anchorEl);
   const handleProfileMenuOpen = (event) => {
@@ -191,15 +193,6 @@ export default function App() {
       <MenuItem onClick={()=>handleLang("german")}>German</MenuItem>
     </Menu>
   );
-
-  const [openDecks, setOpenDecks] = useState(false)
-  const handleDecksOpen = () => setOpenDecks(true)
-  const handleDecksClose = () => setOpenDecks(false)
-
-  const [openDeck, setOpenDeck] = useState(false)
-  const handleDeckOpen = () => setOpenDeck(true)
-  const handleDeckClose = () => setOpenDeck(false)
-
   const getLangURL = (card) => {
     if(lang==="german" && card.foreignNames !== undefined)
       if(card.foreignNames[1].language === "German")
@@ -210,6 +203,15 @@ export default function App() {
     return card.imageUrl
   };
 
+  //slide out drawer hooks
+  const [openDecks, setOpenDecks] = useState(false)
+  const handleDecksOpen = () => setOpenDecks(true)
+  const handleDecksClose = () => setOpenDecks(false)
+  const [openDeck, setOpenDeck] = useState(false)
+  const handleDeckOpen = () => setOpenDeck(true)
+  const handleDeckClose = () => setOpenDeck(false)
+
+  //the page
   if(cards.cards)
     return (
       <div>
@@ -265,7 +267,7 @@ export default function App() {
           </AppBar>
           {renderMenu}
         </div>
-        {/* Drawer Slide Outs */}
+        {/* Deck Drawer Slide Outs */}
         <Drawer anchor="right" open={openDeck} onClose={()=>{handleDeckClose(); setSaved(false)}}>
           <Collapse in={saved}>
             <Alert

@@ -460,6 +460,20 @@ export default function App() {
               >
                 Deck Saved
               </Alert>
+              <Alert
+                action={
+                  <IconButton
+                    color="inherit"
+                    size="small"
+                    onClick={() => {setSaved(false)}}
+                    style={{ backgroundColor: 'none' }}
+                  >
+                    <CloseIcon fontSize="inherit" />
+                  </IconButton>
+                }
+              >
+                Four-Of Limit Exceeded
+              </Alert>
             </Collapse>
             {deck.filter((card, index, self) => index === self.findIndex(t => t.card.name === card.card.name)).map((card) => (
               <div style={{paddingLeft: "20px", paddingTop: "20px"}}>

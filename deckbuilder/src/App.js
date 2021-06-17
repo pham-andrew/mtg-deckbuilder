@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react'
+import { BrowserRouter as Router, Route, Link, Switch } from 'react-router-dom'
+import About from './About'
 
 import { fade, makeStyles, withStyles, createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
@@ -17,10 +19,16 @@ import Dialog from '@material-ui/core/Dialog';
 import MuiDialogTitle from '@material-ui/core/DialogTitle';
 import MuiDialogContent from '@material-ui/core/DialogContent';
 import MuiDialogActions from '@material-ui/core/DialogActions';
-
+import Radio from '@material-ui/core/Radio';
+import RadioGroup from '@material-ui/core/RadioGroup';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import FormControl from '@material-ui/core/FormControl';
+import FormLabel from '@material-ui/core/FormLabel';
+import Checkbox from '@material-ui/core/Checkbox';
+import FormGroup from '@material-ui/core/FormGroup';
 import Alert from '@material-ui/lab/Alert';
-
-import MenuIcon from '@material-ui/icons/Menu';
+import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
+import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import SearchIcon from '@material-ui/icons/Search';
 import MoreIcon from '@material-ui/icons/MoreVert';
 import HighlightOffIcon from '@material-ui/icons/HighlightOff';
@@ -31,6 +39,7 @@ import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
 import CloseIcon from '@material-ui/icons/Close';
 import IndeterminateCheckBoxIcon from '@material-ui/icons/IndeterminateCheckBox';
 import AddBoxIcon from '@material-ui/icons/AddBox';
+import FilterListIcon from '@material-ui/icons/FilterList';
 
 import './App.css'
 
@@ -108,9 +117,23 @@ const useStyles = makeStyles((theme) => ({
       display: 'flex',
     },
   },
+  formControl: {
+    margin: theme.spacing(3),
+  },
+  button: {
+    margin: theme.spacing(1, 1, 0, 0),
+  },
+  drawerHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    padding: theme.spacing(0, 1),
+    // necessary for content to be below app bar
+    ...theme.mixins.toolbar,
+    justifyContent: 'flex-end',
+  },
 }));
 
-//dialog box
+//dialog box styling
 const styles = (theme) => ({
   root: {
     margin: 0,
@@ -123,48 +146,50 @@ const styles = (theme) => ({
     color: theme.palette.grey[500],
   },
 });
+
 const DialogTitle = withStyles(styles)((props) => {
   const { children, classes, onClose, ...other } = props;
   return (
     <MuiDialogTitle disableTypography className={classes.root} {...other}>
       <Typography variant="h6">{children}</Typography>
       {onClose ? (
-        <IconButton aria-label="close" className={classes.closeButton} onClick={onClose}>
+        <IconButton className={classes.closeButton} onClick={onClose}>
           <CloseIcon />
         </IconButton>
       ) : null}
     </MuiDialogTitle>
   );
 });
+
 const DialogContent = withStyles((theme) => ({
   root: {
     padding: theme.spacing(2),
   },
 }))(MuiDialogContent);
+
 const DialogActions = withStyles((theme) => ({
   root: {
     margin: 0,
     padding: theme.spacing(1),
   },
 }))(MuiDialogActions);
-  
+
 
 //the entire app...
 export default function App() {
+
+  const classes = useStyles();
+
+  //filter
   const [cards, setCards] = useState([])
   const [colorChecked, setColor] = useState([])
   const [typeChecked, setType] = useState([])
   const [cost, setCost] = useState(0)
   const [setChecked, setSet] = useState([])
+  const [search, setSearch] = useState("")
 
-  const classes = useStyles();
-  useEffect(() => {
-    fetchCards()
-  }, [])
-
-  //filter
   const handleColorCheckboxChange = (event) =>{
-    let newColor = event.target.id
+    let newColor = event.target.name
     let indexOfColor = -1
     let newColorArray = colorChecked
     if(colorChecked.includes(newColor)){
@@ -175,8 +200,9 @@ export default function App() {
       setColor([...colorChecked, newColor])
     }
   }
+
   const handleTypeCheckboxChange = (event) =>{
-    let newType = event.target.id
+    let newType = event.target.name
     let indexOfType = -1
     let newTypeArray = typeChecked
     if(typeChecked.includes(newType)){
@@ -189,11 +215,11 @@ export default function App() {
   }
 
   const handleCostChange = (event) => {
-    setCost(event.target.id)
+    setCost(event.target.name)
   }
 
   const handleSetChange = (event) => {
-    let newSet = event.target.id
+    let newSet = event.target.name
     let indexOfSet = -1
     let newSetArray = setChecked
     if(setChecked.includes(newSet)) {
@@ -210,19 +236,27 @@ export default function App() {
     fetchCards();
   }
 
+  const handleSearchChange = (e) => {
+    e.preventDefault();
+    setSearch(e.target.value)
+    console.log(search)
+  }
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    fetchCards();
+  }
+
   function resetFilters(e) {
     Array.from(document.querySelectorAll("input")).forEach(input => (input.checked = false))
     setColor([])
     setType([])
     setCost(0)
     setSet([])
- }
-
-  useEffect(() => {
-    fetchCards()
-  }, [])
+  }
 
   async function fetchCards(){
+
     let url = `https://api.magicthegathering.io/v1/cards?gameFormat=standard`
     if(setChecked.length !== 0) {
       url = `${url}&set=${setChecked.join('|')}`
@@ -236,10 +270,32 @@ export default function App() {
     if (cost !== 0) {
       url = `${url}&cmc=${cost}`
     }
+
+    if(search !== ""){
+      url = `https://api.magicthegathering.io/v1/cards?gameFormat=standard&name=${search}`
+    }
+
+    console.log(url)
     let res = await fetch(url)
-    let newCards = await res.json()
-    setCards(newCards)
+    let res2 = await fetch(`${url}&page=2`)
+    let res3 = await fetch(`${url}&page=3`)
+    let res4 = await fetch(`${url}&page=4`)
+    let res5 = await fetch(`${url}&page=5`)
+
+    let newCardsPg1 = await res.json()
+    let newCardsPg2 = await res2.json()
+    let newCardsPg3 = await res3.json()
+    let newCardsPg4 = await res4.json()
+    let newCardsPg5 = await res5.json()
+
+    let allCards = [...newCardsPg1.cards, ...newCardsPg2.cards, ...newCardsPg3.cards, ...newCardsPg4.cards, ...newCardsPg5.cards]
+    setCards(allCards)
   }
+
+  //filter drawer
+  const [openFilter, setOpenFilter] = useState(false)
+  const handleFilterOpen = () => setOpenFilter(true)
+  const handleFilterClose = () => setOpenFilter(false)
 
   //deck
   const [occ, setOcc] = useState({})
@@ -256,6 +312,7 @@ export default function App() {
             c[deck[i].card.name]=-~c[deck[i].card.name]
     setOcc(c)
   }
+
   useEffect(() => {
     countDup()
   }, [deck])
@@ -267,13 +324,16 @@ export default function App() {
   const handleProfileMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
+
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
+
   const handleLang = (l) => {
     setLang(l);
     handleMenuClose();
   };
+
   const renderMenu = (
     <Menu
       anchorEl={anchorEl}
@@ -288,28 +348,31 @@ export default function App() {
       <MenuItem onClick={()=>handleLang("german")}>German</MenuItem>
     </Menu>
   );
+
   const getImgLangURL = (card) => {
     if(lang==="german" && card.foreignNames && card.foreignNames[0])
       if(card.foreignNames[0].language === "German")
-        return card.foreignNames[0].imageUrl  
+        return card.foreignNames[0].imageUrl
     if(lang==="spanish" && card.foreignNames && card.foreignNames[1])
       if(card.foreignNames[1].language === "Spanish")
         return card.foreignNames[1].imageUrl
     return card.imageUrl
   };
+
   const getNameLang = (card) => {
     if(lang==="german" && card.foreignNames && card.foreignNames[0])
       if(card.foreignNames[0].language === "German")
-        return card.foreignNames[0].name  
+        return card.foreignNames[0].name
     if(lang==="spanish" && card.foreignNames && card.foreignNames[1])
       if(card.foreignNames[1].language === "Spanish")
         return card.foreignNames[1].name
     return card.name
   };
+
   const getTextLang = (card) => {
     if(lang==="german" && card.foreignNames && card.foreignNames[0])
       if(card.foreignNames[0].language === "German")
-        return card.foreignNames[0].text  
+        return card.foreignNames[0].text
     if(lang==="spanish" && card.foreignNames && card.foreignNames[1])
       if(card.foreignNames[1].language === "Spanish")
         return card.foreignNames[1].text
@@ -326,35 +389,55 @@ export default function App() {
 
   //dialog
   const [dialog, setDialog] = useState({});
+
   const handleDialogOpen = (n) => {
     setDialog({...dialog, [n]: true});
   };
+
   const handleDialogClose = (n) => {
     setDialog({...dialog, [n]: false});
   };
 
   //disable ripple
-    const theme = createMuiTheme({
-      props: {
-        // Name of the component
-        MuiButtonBase: {
-          // The properties to apply
-          disableRipple: true // No more ripple, on the whole application!
-        }
-      },
-      overrides: {
-        MuiIconButton: {
-          root: {
-            '&:hover': {
-              backgroundColor: "transparent"
-            }
+  const theme = createMuiTheme({
+    props: {
+      // Name of the component
+      MuiButtonBase: {
+        // The properties to apply
+        disableRipple: true // No more ripple, on the whole application!
+      }
+    },
+    overrides: {
+      MuiIconButton: {
+        root: {
+          '&:hover': {
+            backgroundColor: "transparent"
           }
         }
       }
-    });
+    }
+  });
 
-  if(cards.cards){
-    let cardsArray = cards.cards;
+  //paper color
+  const getColor = (c) => {
+    if(c){
+      if(c[0] === "G")
+        return "lightGreen"
+      if(c[0] === "B")
+        return "lightSlateGray"
+      if(c[0] === "U")
+        return "lightBlue"
+      if(c[0] === "R")
+        return "#ffcccb"
+    }
+  }
+
+  useEffect(() => {
+    fetchCards()
+  }, [colorChecked, typeChecked, cost, setChecked])
+
+  //the whole app
+  if(cards){
     return (
       <>
         {/* App Bar */}
@@ -365,9 +448,9 @@ export default function App() {
                 edge="start"
                 className={classes.menuButton}
                 color="inherit"
-                aria-label="open drawer"
+                onClick={handleFilterOpen}
               >
-                <MenuIcon />
+                <FilterListIcon />
               </IconButton>
               <Typography className={classes.title} variant="h6" noWrap>
                 The Better Deck Builder
@@ -471,89 +554,78 @@ export default function App() {
             ))}
           </Drawer>
         </MuiThemeProvider>
-        {/* Filters */}
-        <form onSubmit={handleSubmit} onReset={resetFilters}>
-          <div>
-            <input type="checkbox" id="Blue" name="Blue" value='blue' onChange={handleColorCheckboxChange}/>
-              <label for="Blue">Blue</label>
-            <input type="checkbox" id="White" name="White" value='white' onChange={handleColorCheckboxChange}/>
-              <label for="White">White</label>
-            <input type="checkbox" id="Red" name="Red" value='red' onChange={handleColorCheckboxChange}/>
-              <label for="Red">Red</label>
-            <input type="checkbox" id="Black" name="Black" value='black' onChange={handleColorCheckboxChange}/>
-              <label for="Black">Black</label>
-            <input type="checkbox" id="Green" name="Green" value='green' onChange={handleColorCheckboxChange}/>
-              <label for="Green">Green</label>
-            <input type="checkbox" id="Colorless" name="Colorless" />
-              <label for="Colorless">Colorless</label>
+        {/* Filters TODO DISABLE RIPPLE*/}
+        <Drawer anchor="left" open={openFilter} onClose={()=>handleFilterClose()} variant="persistent">
+          <div className={classes.drawerHeader}>
+            <Typography variant="h6">Filters</Typography>
+            <IconButton onClick={handleFilterClose}>
+              {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+            </IconButton>
           </div>
-          <div>
-            <input type="checkbox" id="Creature" name="Creature" value='Creature' onChange={handleTypeCheckboxChange}/>
-              <label for="Creature">Creature</label>
-            <input type="checkbox" id="Instant" name="Instant" value='Instant' onChange={handleTypeCheckboxChange}/>
-              <label for="Instant">Instant</label>
-            <input type="checkbox" id="Sorcery" name="Sorcery" value='Sorcery' onChange={handleTypeCheckboxChange}/>
-              <label for="Sorcery">Sorcery</label>
-            <input type="checkbox" id="Artifact" name="Artifact" value='Artifact' onChange={handleTypeCheckboxChange}/>
-              <label for="Artifact">Artifact</label>
-            <input type="checkbox" id="Enchantment" name="Enchantment" value='Enchantment' onChange={handleTypeCheckboxChange}/>
-              <label for="Enchantment">Enchantment</label>
-            <input type="checkbox" id="Land" name="Land" value='Land' onChange={handleTypeCheckboxChange}/>
-              <label for="Land">Land</label>
-            <input type="checkbox" id="Planeswalker" name="Planeswalker" value='Planeswalker' onChange={handleTypeCheckboxChange}/>
-              <label for="Planeswalker">Planeswalker</label>
-          </div>
-          <div>
-            <input type="radio" id="1" name="CMC" value="1" onChange={handleCostChange}/>
-              <label for="1">CMC 1</label>
-            <input type="radio" id="2" name="CMC" value="2" onChange={handleCostChange}/>
-              <label for="2">CMC 2</label>
-            <input type="radio" id="3" name="CMC" value="3" onChange={handleCostChange}/>
-              <label for="3">CMC 3</label>
-            <input type="radio" id="4" name="CMC" value="4" onChange={handleCostChange}/>
-              <label for="4">CMC 4</label>
-            <input type="radio" id="5" name="CMC" value="5" onChange={handleCostChange}/>
-              <label for="5">CMC 5</label>
-            <input type="radio" id="6" name="CMC" value="6" onChange={handleCostChange}/>
-              <label for="6">CMC 6</label>
-            <input type="radio" id="7" name="CMC" value="7" onChange={handleCostChange}/>
-              <label for="7">CMC 7</label>
-            <input type="radio" id="8" name="CMC" value="8" onChange={handleCostChange}/>
-              <label for="8">CMC 8</label>
-            <input type="radio" id="9" name="CMC" value="9" onChange={handleCostChange}/>
-              <label for="9">CMC 9</label>
-            <input type="radio" id="12" name="CMC" value="12" onChange={handleCostChange}/>
-              <label for="12">CMC 12</label>
-          </div>
-          <div>
-            <input type="checkbox" id="ELD" name="ELD" value="ELD" onChange={handleSetChange} />
-              <label for="ELD">Throne of Eldraine</label>
-            <input type="checkbox" id="THB" name="THB" value="THB" onChange={handleSetChange} />
-              <label for="THB">Theros Beyond Death</label>
-            <input type="checkbox" id="IKO" name="IKO" value="IKO" onChange={handleSetChange} />
-              <label for="IKO">Ikoria Lair of Behemoths</label>
-            <input type="checkbox" id="M21" name="M21" value="M21" onChange={handleSetChange} />
-              <label for="M21">Core 2021</label>
-            <input type="checkbox" id="ZNR" name="ZNR" value="ZNR" onChange={handleSetChange} />
-              <label for="ZNR">Zendikar Rising</label>
-            <input type="checkbox" id="KHM" name="KHM" value="KHM" onChange={handleSetChange} />
-              <label for="KHM">Kaldheim</label>
-            <input type="checkbox" id="STX" name="STX" value="STX" onChange={handleSetChange} />
-              <label for="STX">Strixhaven</label>
-            <input type="submit" value="Search" />
-            <input type="reset" value="Reset Filters"/>
-          </div>
+          <form onChange={handleSubmit}>
+            <FormControl component="fieldset" className={classes.formControl}>
+              <FormLabel component="legend">Color</FormLabel>
+              <FormGroup name="color">
+                <FormControlLabel control={<Checkbox />} id="Blue" name="blue" value='blue' onChange={handleColorCheckboxChange} label="Blue" />
+                <FormControlLabel control={<Checkbox />} id="White" name="white" value='white' onChange={handleColorCheckboxChange} label="White" />
+                <FormControlLabel control={<Checkbox />} id="Red" name="red" value='red' onChange={handleColorCheckboxChange} label="Red" />
+                <FormControlLabel control={<Checkbox />} id="Black" name="black" value='black' onChange={handleColorCheckboxChange} label="Black" />
+                <FormControlLabel control={<Checkbox />} id="Green" name="green" value='green' onChange={handleColorCheckboxChange} label="Green" />
+                <FormControlLabel control={<Checkbox />} id="Colorless" name="colorless" value='colorless' onChange={handleColorCheckboxChange} label="Colorless" />
+              </FormGroup>
+              <FormLabel component="legend">Type</FormLabel>
+              <FormGroup name="type">
+                <FormControlLabel control={<Checkbox />} type="Creature" id="Creature" name="Creature" value='creature' onChange={handleTypeCheckboxChange} label="Creature" />
+                <FormControlLabel control={<Checkbox />} type="Instant" id="Instant" name="Instant" value='instant' onChange={handleTypeCheckboxChange} label="Instant" />
+                <FormControlLabel control={<Checkbox />} type="Sorcery" id="Sorcery" name="Sorcery" value='sorcery' onChange={handleTypeCheckboxChange} label="Sorcery" />
+                <FormControlLabel control={<Checkbox />} type="Artifact" id="Artifact" name="Artifact" value='artifact' onChange={handleTypeCheckboxChange} label="Artifact" />
+                <FormControlLabel control={<Checkbox />} type="Enchantment" id="Enchantment" name="Enchantment" value='enchantment' onChange={handleTypeCheckboxChange} label="Enchantment" />
+                <FormControlLabel control={<Checkbox />} type="Land" id="Land" name="Land" value='land' onChange={handleTypeCheckboxChange} label="Land" />
+                <FormControlLabel control={<Checkbox />} type="Planeswalker" id="Planeswalker" name="Planeswalker" value='planeswalker' onChange={handleTypeCheckboxChange} label="Planeswalker" />
+              </FormGroup>
+              <FormLabel component="legend">Cost</FormLabel>
+              <RadioGroup name="cost">
+                <FormControlLabel control={<Radio />} id="0" name="0" value="0" onChange={handleCostChange} label="0" />
+                <FormControlLabel control={<Radio />} id="1" name="1" value="1" onChange={handleCostChange} label="1" />
+                <FormControlLabel control={<Radio />} id="2" name="2" value="2" onChange={handleCostChange} label="2" />
+                <FormControlLabel control={<Radio />} id="3" name="3" value="3" onChange={handleCostChange} label="3" />
+                <FormControlLabel control={<Radio />} id="4" name="4" value="4" onChange={handleCostChange} label="4" />
+                <FormControlLabel control={<Radio />} id="5" name="5" value="5" onChange={handleCostChange} label="5" />
+                <FormControlLabel control={<Radio />} id="6" name="6" value="6" onChange={handleCostChange} label="6" />
+                <FormControlLabel control={<Radio />} id="7" name="7" value="7" onChange={handleCostChange} label="7" />
+                <FormControlLabel control={<Radio />} id="8" name="8" value="8" onChange={handleCostChange} label="8" />
+                <FormControlLabel control={<Radio />} id="9" name="9" value="9" onChange={handleCostChange} label="9" />
+                <FormControlLabel control={<Radio />} id="10" name="10" value="10" onChange={handleCostChange} label="10" />
+                <FormControlLabel control={<Radio />} id="11" name="11" value="11" onChange={handleCostChange} label="11" />
+                <FormControlLabel control={<Radio />} id="12" name="12" value="12" onChange={handleCostChange} label="12" />
+              </RadioGroup>
+              <FormLabel component="legend">Set</FormLabel>
+              <FormGroup name="set">
+                <FormControlLabel control={<Checkbox />} id="ELD" name="ELD" value="ELD" onChange={handleSetChange} label="Throne of Elraine" />
+                <FormControlLabel control={<Checkbox />} id="THB" name="THB" value="THB" onChange={handleSetChange} label="Theros Beyond Death" />
+                <FormControlLabel control={<Checkbox />} id="IKO" name="IKO" value="IKO" onChange={handleSetChange} label="Ikoria Lair of Behemoths" />
+                <FormControlLabel control={<Checkbox />} id="M21" name="M21" value="M21" onChange={handleSetChange} label="Core 2021" />
+                <FormControlLabel control={<Checkbox />} id="ZNR" name="ZNR" value="ZNR" onChange={handleSetChange} label="Zendikar Rising" />
+                <FormControlLabel control={<Checkbox />} id="KHM" name="KHM" value="KHM" onChange={handleSetChange} label="Kaldheim" />
+                <FormControlLabel control={<Checkbox />} id="STX" name="STX" value="STX" onChange={handleSetChange} label="Strixhaven" />
+              </FormGroup>
+            </FormControl>
+          </form>
+        </Drawer>
+        <form onSubmit={handleSearchSubmit}>
+          <input type="text" placeholder="Search by card name" value={search} onChange={handleSearchChange}/>
+              <input type="submit" value="Search"/>
         </form>
         {/* Cards */}
         <div className={classes.root}>
-          {cards.cards
+          {cards
           .filter(card=>card.imageUrl!==undefined)
           .filter((card, index, self) => index === self.findIndex(t=> t.name === card.name))
           .map((card) => (
             <>
               {/* Each Card */}
               <Badge badgeContent={occ[card.name]} color="secondary">
-                <Paper elevation={3} className="cards">
+                <Paper elevation={3} className="cards" style={{backgroundColor: getColor(card.colorIdentity)}}>
                   <img src={getImgLangURL(card)} alt={card.name} onClick={()=>handleDialogOpen(card.name)}/>
                   <IconButton size="small" onClick={()=>setDeck([...deck,{card}])}><AddCircleOutlineIcon /></IconButton>
                 </Paper>
@@ -580,6 +652,7 @@ export default function App() {
         </div>
       </>
     )
+  }
   else
     return(<>Loading...</>)
 }

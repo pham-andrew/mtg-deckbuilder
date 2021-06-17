@@ -9,3 +9,6 @@ Features:
 -save a deck
 -load a deck
 -switch between languages
+
+Notes:
+-Filters take a long time to load from API, wait for cards to finish loading

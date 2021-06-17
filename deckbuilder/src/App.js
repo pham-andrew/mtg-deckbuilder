@@ -191,10 +191,8 @@ export default function App() {
       indexOfColor = colorChecked.indexOf(newColor)
       newColorArray.splice(indexOfColor, 1)
       setColor([...newColorArray])
-      console.log("deletion")
     }else {
       setColor([...colorChecked, newColor])
-      console.log("addition")
     }
   }
   const handleTypeCheckboxChange = (event) =>{
@@ -386,8 +384,6 @@ export default function App() {
 
   useEffect(() => {
     fetchCards()
-    console.log(colorChecked)
-    console.log(typeChecked)
   }, [colorChecked, typeChecked, cost, setChecked])
 
   //the whole app
@@ -539,6 +535,7 @@ export default function App() {
               </FormGroup>
               <FormLabel component="legend">Cost</FormLabel>
               <RadioGroup name="cost">
+                <FormControlLabel control={<Radio />} id="0" name="0" value="0" onChange={handleCostChange} label="0" />
                 <FormControlLabel control={<Radio />} id="1" name="1" value="1" onChange={handleCostChange} label="1" />
                 <FormControlLabel control={<Radio />} id="2" name="2" value="2" onChange={handleCostChange} label="2" />
                 <FormControlLabel control={<Radio />} id="3" name="3" value="3" onChange={handleCostChange} label="3" />

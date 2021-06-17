@@ -504,63 +504,65 @@ export default function App() {
             ))}
           </Drawer>
         </MuiThemeProvider>
-        {/* Filters TODO DISABLE RIPPLE*/}
+        {/* Filters */}
         <Drawer anchor="left" open={openFilter} onClose={()=>handleFilterClose()} variant="persistent">
-          <div className={classes.drawerHeader}>
-            <Typography variant="h6">Filters</Typography>
-            <IconButton onClick={handleFilterClose}>
-              {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-            </IconButton>
-          </div>
-          <form onChange={handleSubmit}>
-            <FormControl component="fieldset" className={classes.formControl}>
-              <FormLabel component="legend">Color</FormLabel>
-              <FormGroup name="color">
-                <FormControlLabel control={<Checkbox />} id="Blue" name="blue" value='blue' onChange={handleColorCheckboxChange} label="Blue" />
-                <FormControlLabel control={<Checkbox />} id="White" name="white" value='white' onChange={handleColorCheckboxChange} label="White" />
-                <FormControlLabel control={<Checkbox />} id="Red" name="red" value='red' onChange={handleColorCheckboxChange} label="Red" />
-                <FormControlLabel control={<Checkbox />} id="Black" name="black" value='black' onChange={handleColorCheckboxChange} label="Black" />
-                <FormControlLabel control={<Checkbox />} id="Green" name="green" value='green' onChange={handleColorCheckboxChange} label="Green" />
-                <FormControlLabel control={<Checkbox />} id="Colorless" name="colorless" value='colorless' onChange={handleColorCheckboxChange} label="Colorless" />
-              </FormGroup>
-              <FormLabel component="legend">Type</FormLabel>
-              <FormGroup name="type">
-                <FormControlLabel control={<Checkbox />} type="Creature" id="Creature" name="Creature" value='creature' onChange={handleTypeCheckboxChange} label="Creature" />
-                <FormControlLabel control={<Checkbox />} type="Instant" id="Instant" name="Instant" value='instant' onChange={handleTypeCheckboxChange} label="Instant" />
-                <FormControlLabel control={<Checkbox />} type="Sorcery" id="Sorcery" name="Sorcery" value='sorcery' onChange={handleTypeCheckboxChange} label="Sorcery" />
-                <FormControlLabel control={<Checkbox />} type="Artifact" id="Artifact" name="Artifact" value='artifact' onChange={handleTypeCheckboxChange} label="Artifact" />
-                <FormControlLabel control={<Checkbox />} type="Enchantment" id="Enchantment" name="Enchantment" value='enchantment' onChange={handleTypeCheckboxChange} label="Enchantment" />
-                <FormControlLabel control={<Checkbox />} type="Land" id="Land" name="Land" value='land' onChange={handleTypeCheckboxChange} label="Land" />
-                <FormControlLabel control={<Checkbox />} type="Planeswalker" id="Planeswalker" name="Planeswalker" value='planeswalker' onChange={handleTypeCheckboxChange} label="Planeswalker" />
-              </FormGroup>
-              <FormLabel component="legend">Cost</FormLabel>
-              <RadioGroup name="cost">
-                <FormControlLabel control={<Radio />} id="0" name="0" value="0" onChange={handleCostChange} label="0" />
-                <FormControlLabel control={<Radio />} id="1" name="1" value="1" onChange={handleCostChange} label="1" />
-                <FormControlLabel control={<Radio />} id="2" name="2" value="2" onChange={handleCostChange} label="2" />
-                <FormControlLabel control={<Radio />} id="3" name="3" value="3" onChange={handleCostChange} label="3" />
-                <FormControlLabel control={<Radio />} id="4" name="4" value="4" onChange={handleCostChange} label="4" />
-                <FormControlLabel control={<Radio />} id="5" name="5" value="5" onChange={handleCostChange} label="5" />
-                <FormControlLabel control={<Radio />} id="6" name="6" value="6" onChange={handleCostChange} label="6" />
-                <FormControlLabel control={<Radio />} id="7" name="7" value="7" onChange={handleCostChange} label="7" />
-                <FormControlLabel control={<Radio />} id="8" name="8" value="8" onChange={handleCostChange} label="8" />
-                <FormControlLabel control={<Radio />} id="9" name="9" value="9" onChange={handleCostChange} label="9" />
-                <FormControlLabel control={<Radio />} id="10" name="10" value="10" onChange={handleCostChange} label="10" />
-                <FormControlLabel control={<Radio />} id="11" name="11" value="11" onChange={handleCostChange} label="11" />
-                <FormControlLabel control={<Radio />} id="12" name="12" value="12" onChange={handleCostChange} label="12" />
-              </RadioGroup>
-              <FormLabel component="legend">Set</FormLabel>
-              <FormGroup name="set">
-                <FormControlLabel control={<Checkbox />} id="ELD" name="ELD" value="ELD" onChange={handleSetChange} label="Throne of Elraine" />
-                <FormControlLabel control={<Checkbox />} id="THB" name="THB" value="THB" onChange={handleSetChange} label="Theros Beyond Death" />
-                <FormControlLabel control={<Checkbox />} id="IKO" name="IKO" value="IKO" onChange={handleSetChange} label="Ikoria Lair of Behemoths" />
-                <FormControlLabel control={<Checkbox />} id="M21" name="M21" value="M21" onChange={handleSetChange} label="Core 2021" />
-                <FormControlLabel control={<Checkbox />} id="ZNR" name="ZNR" value="ZNR" onChange={handleSetChange} label="Zendikar Rising" />
-                <FormControlLabel control={<Checkbox />} id="KHM" name="KHM" value="KHM" onChange={handleSetChange} label="Kaldheim" />
-                <FormControlLabel control={<Checkbox />} id="STX" name="STX" value="STX" onChange={handleSetChange} label="Strixhaven" />
-              </FormGroup>
-            </FormControl>
-          </form>
+          <MuiThemeProvider theme={theme}>
+            <div className={classes.drawerHeader}>
+              <Typography variant="h6">Filters</Typography>
+              <IconButton onClick={handleFilterClose}>
+                {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+              </IconButton>
+            </div>
+            <form onChange={handleSubmit}>
+              <FormControl component="fieldset" className={classes.formControl}>
+                <FormLabel component="legend">Color</FormLabel>
+                <FormGroup name="color">
+                  <FormControlLabel control={<Checkbox />} id="Blue" name="blue" value='blue' onChange={handleColorCheckboxChange} label="Blue" />
+                  <FormControlLabel control={<Checkbox />} id="White" name="white" value='white' onChange={handleColorCheckboxChange} label="White" />
+                  <FormControlLabel control={<Checkbox />} id="Red" name="red" value='red' onChange={handleColorCheckboxChange} label="Red" />
+                  <FormControlLabel control={<Checkbox />} id="Black" name="black" value='black' onChange={handleColorCheckboxChange} label="Black" />
+                  <FormControlLabel control={<Checkbox />} id="Green" name="green" value='green' onChange={handleColorCheckboxChange} label="Green" />
+                  <FormControlLabel control={<Checkbox />} id="Colorless" name="colorless" value='colorless' onChange={handleColorCheckboxChange} label="Colorless" />
+                </FormGroup>
+                <FormLabel component="legend">Type</FormLabel>
+                <FormGroup name="type">
+                  <FormControlLabel control={<Checkbox />} type="Creature" id="Creature" name="Creature" value='creature' onChange={handleTypeCheckboxChange} label="Creature" />
+                  <FormControlLabel control={<Checkbox />} type="Instant" id="Instant" name="Instant" value='instant' onChange={handleTypeCheckboxChange} label="Instant" />
+                  <FormControlLabel control={<Checkbox />} type="Sorcery" id="Sorcery" name="Sorcery" value='sorcery' onChange={handleTypeCheckboxChange} label="Sorcery" />
+                  <FormControlLabel control={<Checkbox />} type="Artifact" id="Artifact" name="Artifact" value='artifact' onChange={handleTypeCheckboxChange} label="Artifact" />
+                  <FormControlLabel control={<Checkbox />} type="Enchantment" id="Enchantment" name="Enchantment" value='enchantment' onChange={handleTypeCheckboxChange} label="Enchantment" />
+                  <FormControlLabel control={<Checkbox />} type="Land" id="Land" name="Land" value='land' onChange={handleTypeCheckboxChange} label="Land" />
+                  <FormControlLabel control={<Checkbox />} type="Planeswalker" id="Planeswalker" name="Planeswalker" value='planeswalker' onChange={handleTypeCheckboxChange} label="Planeswalker" />
+                </FormGroup>
+                <FormLabel component="legend">Cost</FormLabel>
+                <RadioGroup name="cost">
+                  <FormControlLabel control={<Radio />} id="0" name="0" value="0" onChange={handleCostChange} label="0" />
+                  <FormControlLabel control={<Radio />} id="1" name="1" value="1" onChange={handleCostChange} label="1" />
+                  <FormControlLabel control={<Radio />} id="2" name="2" value="2" onChange={handleCostChange} label="2" />
+                  <FormControlLabel control={<Radio />} id="3" name="3" value="3" onChange={handleCostChange} label="3" />
+                  <FormControlLabel control={<Radio />} id="4" name="4" value="4" onChange={handleCostChange} label="4" />
+                  <FormControlLabel control={<Radio />} id="5" name="5" value="5" onChange={handleCostChange} label="5" />
+                  <FormControlLabel control={<Radio />} id="6" name="6" value="6" onChange={handleCostChange} label="6" />
+                  <FormControlLabel control={<Radio />} id="7" name="7" value="7" onChange={handleCostChange} label="7" />
+                  <FormControlLabel control={<Radio />} id="8" name="8" value="8" onChange={handleCostChange} label="8" />
+                  <FormControlLabel control={<Radio />} id="9" name="9" value="9" onChange={handleCostChange} label="9" />
+                  <FormControlLabel control={<Radio />} id="10" name="10" value="10" onChange={handleCostChange} label="10" />
+                  <FormControlLabel control={<Radio />} id="11" name="11" value="11" onChange={handleCostChange} label="11" />
+                  <FormControlLabel control={<Radio />} id="12" name="12" value="12" onChange={handleCostChange} label="12" />
+                </RadioGroup>
+                <FormLabel component="legend">Set</FormLabel>
+                <FormGroup name="set">
+                  <FormControlLabel control={<Checkbox />} id="ELD" name="ELD" value="ELD" onChange={handleSetChange} label="Throne of Elraine" />
+                  <FormControlLabel control={<Checkbox />} id="THB" name="THB" value="THB" onChange={handleSetChange} label="Theros Beyond Death" />
+                  <FormControlLabel control={<Checkbox />} id="IKO" name="IKO" value="IKO" onChange={handleSetChange} label="Ikoria Lair of Behemoths" />
+                  <FormControlLabel control={<Checkbox />} id="M21" name="M21" value="M21" onChange={handleSetChange} label="Core 2021" />
+                  <FormControlLabel control={<Checkbox />} id="ZNR" name="ZNR" value="ZNR" onChange={handleSetChange} label="Zendikar Rising" />
+                  <FormControlLabel control={<Checkbox />} id="KHM" name="KHM" value="KHM" onChange={handleSetChange} label="Kaldheim" />
+                  <FormControlLabel control={<Checkbox />} id="STX" name="STX" value="STX" onChange={handleSetChange} label="Strixhaven" />
+                </FormGroup>
+              </FormControl>
+            </form>
+          </MuiThemeProvider>
         </Drawer>
         {/* Cards */}
         <div className={classes.root}>

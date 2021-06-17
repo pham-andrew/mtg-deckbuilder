@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react'
-import { BrowserRouter as Router, Route, Link, Switch } from 'react-router-dom'
-import About from './About'
+import React, { useEffect, useState } from 'react';
+import { BrowserRouter as Router, Route, Link, Switch } from 'react-router-dom';
+import About from './About';
 
 import { fade, makeStyles, withStyles, createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
@@ -285,13 +285,17 @@ export default function App() {
   const [decks, setDecks] = useState([])
   const [saved, setSaved] = useState(false)
   const [loaded, setLoaded] = useState(false)
+  const [four, setFour] = useState(false)
   const countDup = () => {
     var c = {}
     for(var i=0;i<deck.length;i++)
       if(!c[deck[i].card.name])
         for(var j=0;j<deck.length;j++)
-          if(deck[i].card.name===deck[j].card.name)
+          if(deck[i].card.name===deck[j].card.name){
             c[deck[i].card.name]=-~c[deck[i].card.name]
+            if(c[deck[i].card.name] > 4)
+              setFour(true)
+          }
     setOcc(c)
   }
 
@@ -306,11 +310,9 @@ export default function App() {
   const handleProfileMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
-
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
-
   const handleLang = (l) => {
     setLang(l);
     handleMenuClose();
@@ -383,10 +385,8 @@ export default function App() {
   //disable ripple
   const theme = createMuiTheme({
     props: {
-      // Name of the component
       MuiButtonBase: {
-        // The properties to apply
-        disableRipple: true // No more ripple, on the whole application!
+        disableRipple: true
       }
     },
     overrides: {
@@ -480,6 +480,22 @@ export default function App() {
         <MuiThemeProvider theme={theme}>
           {/* Deck Drawer Slide Outs */}
           <Drawer anchor="right" open={openDeck} onClose={()=>{handleDeckClose(); setSaved(false)}}>
+            <Collapse in={four}>
+              <Alert
+                action={
+                  <IconButton
+                    color="inherit"
+                    size="small"
+                    onClick={() => {setFour(false)}}
+                    style={{ backgroundColor: 'none' }}
+                  >
+                    <CloseIcon fontSize="inherit" />
+                  </IconButton>
+                }
+              >
+                Four-Of Rule Exceeded
+              </Alert>
+            </Collapse>
             <Collapse in={saved}>
               <Alert
                 action={

@@ -278,24 +278,12 @@ export default function App() {
     console.log(url)
     let res = await fetch(url)
     let res2 = await fetch(`${url}&page=2`)
-    let res3 = await fetch(`${url}&page=3`)
-    let res4 = await fetch(`${url}&page=4`)
-    let res5 = await fetch(`${url}&page=5`)
-
     let newCardsPg1 = await res.json()
     let newCardsPg2 = await res2.json()
-    let newCardsPg3 = await res3.json()
-    let newCardsPg4 = await res4.json()
-    let newCardsPg5 = await res5.json()
 
-    let allCards = [...newCardsPg1.cards, ...newCardsPg2.cards, ...newCardsPg3.cards, ...newCardsPg4.cards, ...newCardsPg5.cards]
+    let allCards = [...newCardsPg1.cards, ...newCardsPg2.cards]
     setCards(allCards)
   }
-  //filter drawer
-  const [openFilter, setOpenFilter] = useState(false)
-  const handleFilterOpen = () => setOpenFilter(true)
-  const handleFilterClose = () => setOpenFilter(false)
-
   //filter drawer
   const [openFilter, setOpenFilter] = useState(false)
   const handleFilterOpen = () => setOpenFilter(true)
@@ -514,20 +502,6 @@ export default function App() {
               >
                 Deck Saved
               </Alert>
-              <Alert
-                action={
-                  <IconButton
-                    color="inherit"
-                    size="small"
-                    onClick={() => {setSaved(false)}}
-                    style={{ backgroundColor: 'none' }}
-                  >
-                    <CloseIcon fontSize="inherit" />
-                  </IconButton>
-                }
-              >
-                Four-Of Limit Exceeded
-              </Alert>
             </Collapse>
             {deck.filter((card, index, self) => index === self.findIndex(t => t.card.name === card.card.name)).map((card) => (
               <div style={{paddingLeft: "20px", paddingTop: "20px"}}>
@@ -588,7 +562,6 @@ export default function App() {
                   <FormControlLabel control={<Checkbox />} id="Red" name="red" value='red' onChange={handleColorCheckboxChange} label="Red" />
                   <FormControlLabel control={<Checkbox />} id="Black" name="black" value='black' onChange={handleColorCheckboxChange} label="Black" />
                   <FormControlLabel control={<Checkbox />} id="Green" name="green" value='green' onChange={handleColorCheckboxChange} label="Green" />
-                  <FormControlLabel control={<Checkbox />} id="Colorless" name="colorless" value='colorless' onChange={handleColorCheckboxChange} label="Colorless" />
                 </FormGroup>
                 <FormLabel component="legend">Type</FormLabel>
                 <FormGroup name="type">

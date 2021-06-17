@@ -6,3 +6,8 @@ img {
 .cards {
   text-align: center;
 }
+
+Link{
+  text-decoration: none;
+  color: inherit;
+}

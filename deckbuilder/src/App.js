@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { BrowserRouter as Router, Route, Link, Switch } from 'react-router-dom'
+import { Route, Link, Switch } from 'react-router-dom'
 import About from './About'
 
 import { fade, makeStyles, withStyles, createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
@@ -278,24 +278,12 @@ export default function App() {
     console.log(url)
     let res = await fetch(url)
     let res2 = await fetch(`${url}&page=2`)
-    let res3 = await fetch(`${url}&page=3`)
-    let res4 = await fetch(`${url}&page=4`)
-    let res5 = await fetch(`${url}&page=5`)
-
     let newCardsPg1 = await res.json()
     let newCardsPg2 = await res2.json()
-    let newCardsPg3 = await res3.json()
-    let newCardsPg4 = await res4.json()
-    let newCardsPg5 = await res5.json()
 
-    let allCards = [...newCardsPg1.cards, ...newCardsPg2.cards, ...newCardsPg3.cards, ...newCardsPg4.cards, ...newCardsPg5.cards]
+    let allCards = [...newCardsPg1.cards, ...newCardsPg2.cards]
     setCards(allCards)
   }
-  //filter drawer
-  const [openFilter, setOpenFilter] = useState(false)
-  const handleFilterOpen = () => setOpenFilter(true)
-  const handleFilterClose = () => setOpenFilter(false)
-
   //filter drawer
   const [openFilter, setOpenFilter] = useState(false)
   const handleFilterOpen = () => setOpenFilter(true)
@@ -514,20 +502,6 @@ export default function App() {
               >
                 Deck Saved
               </Alert>
-              <Alert
-                action={
-                  <IconButton
-                    color="inherit"
-                    size="small"
-                    onClick={() => {setSaved(false)}}
-                    style={{ backgroundColor: 'none' }}
-                  >
-                    <CloseIcon fontSize="inherit" />
-                  </IconButton>
-                }
-              >
-                Four-Of Limit Exceeded
-              </Alert>
             </Collapse>
             {deck.filter((card, index, self) => index === self.findIndex(t => t.card.name === card.card.name)).map((card) => (
               <div style={{paddingLeft: "20px", paddingTop: "20px"}}>
@@ -588,7 +562,6 @@ export default function App() {
                   <FormControlLabel control={<Checkbox />} id="Red" name="red" value='red' onChange={handleColorCheckboxChange} label="Red" />
                   <FormControlLabel control={<Checkbox />} id="Black" name="black" value='black' onChange={handleColorCheckboxChange} label="Black" />
                   <FormControlLabel control={<Checkbox />} id="Green" name="green" value='green' onChange={handleColorCheckboxChange} label="Green" />
-                  <FormControlLabel control={<Checkbox />} id="Colorless" name="colorless" value='colorless' onChange={handleColorCheckboxChange} label="Colorless" />
                 </FormGroup>
                 <FormLabel component="legend">Type</FormLabel>
                 <FormGroup name="type">
@@ -630,102 +603,107 @@ export default function App() {
             </form>
           </Drawer>
         </MuiThemeProvider>
-        {/* Filters */}
-        <Drawer anchor="left" open={openFilter} onClose={()=>handleFilterClose()} variant="persistent">
-          <div className={classes.drawerHeader}>
-            <Typography variant="h6">Filters</Typography>
-            <IconButton onClick={handleFilterClose}>
-              {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-            </IconButton>
-          </div>
-          <form onChange={handleSubmit}>
-            <FormControl component="fieldset" className={classes.formControl}>
-              <FormLabel component="legend">Color</FormLabel>
-              <FormGroup name="color">
-                <FormControlLabel control={<Checkbox />} id="Blue" name="blue" value='blue' onChange={handleColorCheckboxChange} label="Blue" />
-                <FormControlLabel control={<Checkbox />} id="White" name="white" value='white' onChange={handleColorCheckboxChange} label="White" />
-                <FormControlLabel control={<Checkbox />} id="Red" name="red" value='red' onChange={handleColorCheckboxChange} label="Red" />
-                <FormControlLabel control={<Checkbox />} id="Black" name="black" value='black' onChange={handleColorCheckboxChange} label="Black" />
-                <FormControlLabel control={<Checkbox />} id="Green" name="green" value='green' onChange={handleColorCheckboxChange} label="Green" />
-                <FormControlLabel control={<Checkbox />} id="Colorless" name="colorless" value='colorless' onChange={handleColorCheckboxChange} label="Colorless" />
-              </FormGroup>
-              <FormLabel component="legend">Type</FormLabel>
-              <FormGroup name="type">
-                <FormControlLabel control={<Checkbox />} type="Creature" id="Creature" name="Creature" value='creature' onChange={handleTypeCheckboxChange} label="Creature" />
-                <FormControlLabel control={<Checkbox />} type="Instant" id="Instant" name="Instant" value='instant' onChange={handleTypeCheckboxChange} label="Instant" />
-                <FormControlLabel control={<Checkbox />} type="Sorcery" id="Sorcery" name="Sorcery" value='sorcery' onChange={handleTypeCheckboxChange} label="Sorcery" />
-                <FormControlLabel control={<Checkbox />} type="Artifact" id="Artifact" name="Artifact" value='artifact' onChange={handleTypeCheckboxChange} label="Artifact" />
-                <FormControlLabel control={<Checkbox />} type="Enchantment" id="Enchantment" name="Enchantment" value='enchantment' onChange={handleTypeCheckboxChange} label="Enchantment" />
-                <FormControlLabel control={<Checkbox />} type="Land" id="Land" name="Land" value='land' onChange={handleTypeCheckboxChange} label="Land" />
-                <FormControlLabel control={<Checkbox />} type="Planeswalker" id="Planeswalker" name="Planeswalker" value='planeswalker' onChange={handleTypeCheckboxChange} label="Planeswalker" />
-              </FormGroup>
-              <FormLabel component="legend">Cost</FormLabel>
-              <RadioGroup name="cost">
-                <FormControlLabel control={<Radio />} id="0" name="0" value="0" onChange={handleCostChange} label="0" />
-                <FormControlLabel control={<Radio />} id="1" name="1" value="1" onChange={handleCostChange} label="1" />
-                <FormControlLabel control={<Radio />} id="2" name="2" value="2" onChange={handleCostChange} label="2" />
-                <FormControlLabel control={<Radio />} id="3" name="3" value="3" onChange={handleCostChange} label="3" />
-                <FormControlLabel control={<Radio />} id="4" name="4" value="4" onChange={handleCostChange} label="4" />
-                <FormControlLabel control={<Radio />} id="5" name="5" value="5" onChange={handleCostChange} label="5" />
-                <FormControlLabel control={<Radio />} id="6" name="6" value="6" onChange={handleCostChange} label="6" />
-                <FormControlLabel control={<Radio />} id="7" name="7" value="7" onChange={handleCostChange} label="7" />
-                <FormControlLabel control={<Radio />} id="8" name="8" value="8" onChange={handleCostChange} label="8" />
-                <FormControlLabel control={<Radio />} id="9" name="9" value="9" onChange={handleCostChange} label="9" />
-                <FormControlLabel control={<Radio />} id="10" name="10" value="10" onChange={handleCostChange} label="10" />
-                <FormControlLabel control={<Radio />} id="11" name="11" value="11" onChange={handleCostChange} label="11" />
-                <FormControlLabel control={<Radio />} id="12" name="12" value="12" onChange={handleCostChange} label="12" />
-              </RadioGroup>
-              <FormLabel component="legend">Set</FormLabel>
-              <FormGroup name="set">
-                <FormControlLabel control={<Checkbox />} id="ELD" name="ELD" value="ELD" onChange={handleSetChange} label="Throne of Elraine" />
-                <FormControlLabel control={<Checkbox />} id="THB" name="THB" value="THB" onChange={handleSetChange} label="Theros Beyond Death" />
-                <FormControlLabel control={<Checkbox />} id="IKO" name="IKO" value="IKO" onChange={handleSetChange} label="Ikoria Lair of Behemoths" />
-                <FormControlLabel control={<Checkbox />} id="M21" name="M21" value="M21" onChange={handleSetChange} label="Core 2021" />
-                <FormControlLabel control={<Checkbox />} id="ZNR" name="ZNR" value="ZNR" onChange={handleSetChange} label="Zendikar Rising" />
-                <FormControlLabel control={<Checkbox />} id="KHM" name="KHM" value="KHM" onChange={handleSetChange} label="Kaldheim" />
-                <FormControlLabel control={<Checkbox />} id="STX" name="STX" value="STX" onChange={handleSetChange} label="Strixhaven" />
-              </FormGroup>
-            </FormControl>
-          </form>
-        </Drawer>
-        <form onSubmit={handleSearchSubmit}>
-          <input type="text" placeholder="Search by card name" value={search} onChange={handleSearchChange}/>
-              <input type="submit" value="Search"/>
-        </form>
-        {/* Cards */}
-        <div className={classes.root}>
-          {cards
-          .filter(card=>card.imageUrl!==undefined)
-          .filter((card, index, self) => index === self.findIndex(t=> t.name === card.name))
-          .map((card) => (
+          <Link to="/">Home</Link>
+          <br/>
+          <Link to="/About">About</Link>
+
+          <Route exact path="/About" component={About}/>
+          <Route exact path="/">
             <>
-              {/* Each Card */}
-              <Badge badgeContent={occ[card.name]} color="secondary">
-                <Paper elevation={3} className="cards" style={{backgroundColor: getColor(card.colorIdentity)}}>
-                  <img src={getImgLangURL(card)} alt={card.name} onClick={()=>handleDialogOpen(card.name)}/>
-                  <IconButton size="small" onClick={()=>setDeck([...deck,{card}])}><AddCircleOutlineIcon /></IconButton>
-                </Paper>
-              </Badge>
-              {/* Each Card's dialog */}
-              <Dialog onClose={()=>handleDialogClose(card.name)} open={dialog[card.name]}>
-                <DialogTitle onClose={()=>handleDialogClose(card.name)}>
-                  {getNameLang(card)}
-                </DialogTitle>
-                <DialogContent dividers>
-                  <img src={getImgLangURL(card)} alt={card.name}/>
-                  <Typography gutterBottom>
-                    {getTextLang(card)}
-                  </Typography>
-                </DialogContent>
-                <DialogActions>
-                  <Button autoFocus onClick={()=>handleDialogClose(card.name)} color="primary">
-                    Close
-                  </Button>
-                </DialogActions>
-              </Dialog>
+              <Drawer anchor="left" open={openFilter} onClose={()=>handleFilterClose()} variant="persistent">
+                <div className={classes.drawerHeader}>
+                  <Typography variant="h6">Filters</Typography>
+                  <IconButton onClick={handleFilterClose}>
+                    {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+                  </IconButton>
+                </div>
+                <form onChange={handleSubmit}>
+                  <FormControl component="fieldset" className={classes.formControl}>
+                    <FormLabel component="legend">Color</FormLabel>
+                    <FormGroup name="color">
+                      <FormControlLabel control={<Checkbox />} id="Blue" name="blue" value='blue' onChange={handleColorCheckboxChange} label="Blue" />
+                      <FormControlLabel control={<Checkbox />} id="White" name="white" value='white' onChange={handleColorCheckboxChange} label="White" />
+                      <FormControlLabel control={<Checkbox />} id="Red" name="red" value='red' onChange={handleColorCheckboxChange} label="Red" />
+                      <FormControlLabel control={<Checkbox />} id="Black" name="black" value='black' onChange={handleColorCheckboxChange} label="Black" />
+                      <FormControlLabel control={<Checkbox />} id="Green" name="green" value='green' onChange={handleColorCheckboxChange} label="Green" />
+                      <FormControlLabel control={<Checkbox />} id="Colorless" name="colorless" value='colorless' onChange={handleColorCheckboxChange} label="Colorless" />
+                    </FormGroup>
+                    <FormLabel component="legend">Type</FormLabel>
+                    <FormGroup name="type">
+                      <FormControlLabel control={<Checkbox />} type="Creature" id="Creature" name="Creature" value='creature' onChange={handleTypeCheckboxChange} label="Creature" />
+                      <FormControlLabel control={<Checkbox />} type="Instant" id="Instant" name="Instant" value='instant' onChange={handleTypeCheckboxChange} label="Instant" />
+                      <FormControlLabel control={<Checkbox />} type="Sorcery" id="Sorcery" name="Sorcery" value='sorcery' onChange={handleTypeCheckboxChange} label="Sorcery" />
+                      <FormControlLabel control={<Checkbox />} type="Artifact" id="Artifact" name="Artifact" value='artifact' onChange={handleTypeCheckboxChange} label="Artifact" />
+                      <FormControlLabel control={<Checkbox />} type="Enchantment" id="Enchantment" name="Enchantment" value='enchantment' onChange={handleTypeCheckboxChange} label="Enchantment" />
+                      <FormControlLabel control={<Checkbox />} type="Land" id="Land" name="Land" value='land' onChange={handleTypeCheckboxChange} label="Land" />
+                      <FormControlLabel control={<Checkbox />} type="Planeswalker" id="Planeswalker" name="Planeswalker" value='planeswalker' onChange={handleTypeCheckboxChange} label="Planeswalker" />
+                    </FormGroup>
+                    <FormLabel component="legend">Cost</FormLabel>
+                    <RadioGroup name="cost">
+                      <FormControlLabel control={<Radio />} id="0" name="0" value="0" onChange={handleCostChange} label="0" />
+                      <FormControlLabel control={<Radio />} id="1" name="1" value="1" onChange={handleCostChange} label="1" />
+                      <FormControlLabel control={<Radio />} id="2" name="2" value="2" onChange={handleCostChange} label="2" />
+                      <FormControlLabel control={<Radio />} id="3" name="3" value="3" onChange={handleCostChange} label="3" />
+                      <FormControlLabel control={<Radio />} id="4" name="4" value="4" onChange={handleCostChange} label="4" />
+                      <FormControlLabel control={<Radio />} id="5" name="5" value="5" onChange={handleCostChange} label="5" />
+                      <FormControlLabel control={<Radio />} id="6" name="6" value="6" onChange={handleCostChange} label="6" />
+                      <FormControlLabel control={<Radio />} id="7" name="7" value="7" onChange={handleCostChange} label="7" />
+                      <FormControlLabel control={<Radio />} id="8" name="8" value="8" onChange={handleCostChange} label="8" />
+                      <FormControlLabel control={<Radio />} id="9" name="9" value="9" onChange={handleCostChange} label="9" />
+                      <FormControlLabel control={<Radio />} id="10" name="10" value="10" onChange={handleCostChange} label="10" />
+                      <FormControlLabel control={<Radio />} id="11" name="11" value="11" onChange={handleCostChange} label="11" />
+                      <FormControlLabel control={<Radio />} id="12" name="12" value="12" onChange={handleCostChange} label="12" />
+                    </RadioGroup>
+                    <FormLabel component="legend">Set</FormLabel>
+                    <FormGroup name="set">
+                      <FormControlLabel control={<Checkbox />} id="ELD" name="ELD" value="ELD" onChange={handleSetChange} label="Throne of Elraine" />
+                      <FormControlLabel control={<Checkbox />} id="THB" name="THB" value="THB" onChange={handleSetChange} label="Theros Beyond Death" />
+                      <FormControlLabel control={<Checkbox />} id="IKO" name="IKO" value="IKO" onChange={handleSetChange} label="Ikoria Lair of Behemoths" />
+                      <FormControlLabel control={<Checkbox />} id="M21" name="M21" value="M21" onChange={handleSetChange} label="Core 2021" />
+                      <FormControlLabel control={<Checkbox />} id="ZNR" name="ZNR" value="ZNR" onChange={handleSetChange} label="Zendikar Rising" />
+                      <FormControlLabel control={<Checkbox />} id="KHM" name="KHM" value="KHM" onChange={handleSetChange} label="Kaldheim" />
+                      <FormControlLabel control={<Checkbox />} id="STX" name="STX" value="STX" onChange={handleSetChange} label="Strixhaven" />
+                    </FormGroup>
+                  </FormControl>
+                </form>
+              </Drawer>
+              <form onSubmit={handleSearchSubmit}>
+                <input type="text" placeholder="Search by card name" value={search} onChange={handleSearchChange}/>
+                    <input type="submit" value="Search"/>
+              </form>
+              <div className={classes.root}>
+                {cards
+                .filter(card=>card.imageUrl!==undefined)
+                .filter((card, index, self) => index === self.findIndex(t=> t.name === card.name))
+                .map((card) => (
+                  <>
+                    <Badge badgeContent={occ[card.name]} color="secondary">
+                      <Paper elevation={3} className="cards" style={{backgroundColor: getColor(card.colorIdentity)}}>
+                        <img src={getImgLangURL(card)} alt={card.name} onClick={()=>handleDialogOpen(card.name)}/>
+                        <IconButton size="small" onClick={()=>setDeck([...deck,{card}])}><AddCircleOutlineIcon /></IconButton>
+                      </Paper>
+                    </Badge>
+                    <Dialog onClose={()=>handleDialogClose(card.name)} open={dialog[card.name]}>
+                      <DialogTitle onClose={()=>handleDialogClose(card.name)}>
+                        {getNameLang(card)}
+                      </DialogTitle>
+                      <DialogContent dividers>
+                        <img src={getImgLangURL(card)} alt={card.name}/>
+                        <Typography gutterBottom>
+                          {getTextLang(card)}
+                        </Typography>
+                      </DialogContent>
+                      <DialogActions>
+                        <Button autoFocus onClick={()=>handleDialogClose(card.name)} color="primary">
+                          Close
+                        </Button>
+                      </DialogActions>
+                    </Dialog>
+                  </>
+                ))}
+              </div>
             </>
-          ))}
-        </div>
+          </Route>
       </>
     )
   }

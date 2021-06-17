@@ -442,8 +442,8 @@ export default function App() {
           </AppBar>
           {renderMenu}
         </div>
-        {/* Deck Drawer Slide Outs */}
         <MuiThemeProvider theme={theme}>
+          {/* Deck Drawer Slide Outs */}
           <Drawer anchor="right" open={openDeck} onClose={()=>{handleDeckClose(); setSaved(false)}}>
             <Collapse in={saved}>
               <Alert
@@ -461,7 +461,7 @@ export default function App() {
                 Deck Saved
               </Alert>
             </Collapse>
-            {deck.map((card) => (
+            {deck.filter((card, index, self) => index === self.findIndex(t => t.card.name === card.card.name)).map((card) => (
               <div style={{paddingLeft: "20px", paddingTop: "20px"}}>
                 <Badge badgeContent={occ[card.card.name]} color="secondary" anchorOrigin={{vertical: 'top',horizontal: 'left',}} >
                   <Paper elevation={3} className={classes.drawer}>
@@ -503,10 +503,8 @@ export default function App() {
               </Paper>
             ))}
           </Drawer>
-        </MuiThemeProvider>
-        {/* Filters */}
-        <Drawer anchor="left" open={openFilter} onClose={()=>handleFilterClose()} variant="persistent">
-          <MuiThemeProvider theme={theme}>
+          {/* Filters */}
+          <Drawer anchor="left" open={openFilter} onClose={()=>handleFilterClose()} variant="persistent">
             <div className={classes.drawerHeader}>
               <Typography variant="h6">Filters</Typography>
               <IconButton onClick={handleFilterClose}>
@@ -562,8 +560,8 @@ export default function App() {
                 </FormGroup>
               </FormControl>
             </form>
-          </MuiThemeProvider>
-        </Drawer>
+          </Drawer>
+        </MuiThemeProvider>
         {/* Cards */}
         <div className={classes.root}>
           {cards.cards

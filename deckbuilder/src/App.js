@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Route, Link, Switch } from 'react-router-dom'
 import About from './About'
 
+
 import { fade, makeStyles, withStyles, createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import IconButton from '@material-ui/core/IconButton';
@@ -238,21 +239,11 @@ export default function App() {
   const handleSearchChange = (e) => {
     e.preventDefault();
     setSearch(e.target.value)
-    console.log(search)
   }
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     fetchCards();
-  }
-
-  //TODO see if still needed
-  function resetFilters(e) {
-    Array.from(document.querySelectorAll("input")).forEach(input => (input.checked = false))
-    setColor([])
-    setType([])
-    setCost(0)
-    setSet([])
   }
 
   async function fetchCards(){
@@ -274,8 +265,6 @@ export default function App() {
     if(search !== ""){
       url = `https://api.magicthegathering.io/v1/cards?gameFormat=standard&name=${search}`
     }
-
-    console.log(url)
     let res = await fetch(url)
     let res2 = await fetch(`${url}&page=2`)
     let newCardsPg1 = await res.json()
@@ -295,13 +284,24 @@ export default function App() {
   const [decks, setDecks] = useState([])
   const [saved, setSaved] = useState(false)
   const [loaded, setLoaded] = useState(false)
+  const [four, setFour] = useState(false)
   const countDup = () => {
     var c = {}
     for(var i=0;i<deck.length;i++)
       if(!c[deck[i].card.name])
         for(var j=0;j<deck.length;j++)
-          if(deck[i].card.name===deck[j].card.name)
+          if(deck[i].card.name===deck[j].card.name){
             c[deck[i].card.name]=-~c[deck[i].card.name]
+            if(
+              c[deck[i].card.name] > 4
+              && deck[i].card.name !== "Plains" 
+              && deck[i].card.name !== "Mountain" 
+              && deck[i].card.name !== "Forest" 
+              && deck[i].card.name !== "Island" 
+              && deck[i].card.name !== "Swamp"
+            )
+              setFour(true)
+          }
     setOcc(c)
   }
 
@@ -316,11 +316,9 @@ export default function App() {
   const handleProfileMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
-
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
-
   const handleLang = (l) => {
     setLang(l);
     handleMenuClose();
@@ -393,10 +391,8 @@ export default function App() {
   //disable ripple
   const theme = createMuiTheme({
     props: {
-      // Name of the component
       MuiButtonBase: {
-        // The properties to apply
-        disableRipple: true // No more ripple, on the whole application!
+        disableRipple: true
       }
     },
     overrides: {
@@ -457,6 +453,9 @@ export default function App() {
                     root: classes.inputRoot,
                     input: classes.inputInput,
                   }}
+                  onChange={handleSearchChange}
+                  onKeyUp={handleSearchSubmit}
+                  value={search}
                 />
               </div>
               <div className={classes.grow} />
@@ -487,6 +486,23 @@ export default function App() {
         <MuiThemeProvider theme={theme}>
           {/* Deck Drawer Slide Outs */}
           <Drawer anchor="right" open={openDeck} onClose={()=>{handleDeckClose(); setSaved(false)}}>
+            <Collapse in={four}>
+              <Alert
+                severity="error"
+                action={
+                  <IconButton
+                    color="inherit"
+                    size="small"
+                    onClick={() => {setFour(false)}}
+                    style={{ backgroundColor: 'none' }}
+                  >
+                    <CloseIcon fontSize="inherit" />
+                  </IconButton>
+                }
+              >
+                Four-Of Rule Exceeded
+              </Alert>
+            </Collapse>
             <Collapse in={saved}>
               <Alert
                 action={
@@ -603,12 +619,17 @@ export default function App() {
             </form>
           </Drawer>
         </MuiThemeProvider>
-          <Link to="/">Home</Link>
-          <br/>
-          <Link to="/About">About</Link>
-
-          <Route exact path="/About" component={About}/>
-          <Route exact path="/">
+        <Link to="/">Home</Link>
+        <br/>
+        <Link to="/About">About</Link>
+        <Route exact path="/About" component={About}/>
+        <Route exact path="/">
+        {/* Cards */}
+        <div className={classes.root}>
+          {cards
+          .filter(card=>card.imageUrl!==undefined)
+          .filter((card, index, self) => index === self.findIndex(t=> t.name === card.name))
+          .map((card) => (
             <>
               <Drawer anchor="left" open={openFilter} onClose={()=>handleFilterClose()} variant="persistent">
                 <div className={classes.drawerHeader}>

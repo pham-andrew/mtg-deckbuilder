@@ -523,7 +523,7 @@ export default function App() {
             {deck.filter((card, index, self) => index === self.findIndex(t => t.card.name === card.card.name)).map((card) => (
               <div style={{paddingLeft: "20px", paddingTop: "20px"}}>
                 <Badge badgeContent={occ[card.card.name]} color="secondary" anchorOrigin={{vertical: 'top',horizontal: 'left',}} >
-                  <Paper elevation={3} className={classes.drawer}>
+                  <Paper elevation={3} className={classes.drawer} style={{backgroundColor: getColor(card.card.colorIdentity)}}>
                     <img src={getImgLangURL(card.card)} alt={card.card.name}/>
                     <IconButton onClick={() => setDeck(deck.slice(0,deck.indexOf(card)).concat(deck.slice(deck.indexOf(card)+1)))}>
                       <IndeterminateCheckBoxIcon />

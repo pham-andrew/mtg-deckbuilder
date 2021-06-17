@@ -238,21 +238,11 @@ export default function App() {
   const handleSearchChange = (e) => {
     e.preventDefault();
     setSearch(e.target.value)
-    console.log(search)
   }
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     fetchCards();
-  }
-
-  //TODO see if still needed
-  function resetFilters(e) {
-    Array.from(document.querySelectorAll("input")).forEach(input => (input.checked = false))
-    setColor([])
-    setType([])
-    setCost(0)
-    setSet([])
   }
 
   async function fetchCards(){
@@ -457,6 +447,9 @@ export default function App() {
                     root: classes.inputRoot,
                     input: classes.inputInput,
                   }}
+                  onChange={handleSearchChange}
+                  onKeyUp={handleSearchSubmit}
+                  value={search}
                 />
               </div>
               <div className={classes.grow} />
@@ -620,7 +613,6 @@ export default function App() {
                 <FormControlLabel control={<Checkbox />} id="Red" name="red" value='red' onChange={handleColorCheckboxChange} label="Red" />
                 <FormControlLabel control={<Checkbox />} id="Black" name="black" value='black' onChange={handleColorCheckboxChange} label="Black" />
                 <FormControlLabel control={<Checkbox />} id="Green" name="green" value='green' onChange={handleColorCheckboxChange} label="Green" />
-                <FormControlLabel control={<Checkbox />} id="Colorless" name="colorless" value='colorless' onChange={handleColorCheckboxChange} label="Colorless" />
               </FormGroup>
               <FormLabel component="legend">Type</FormLabel>
               <FormGroup name="type">
@@ -661,10 +653,6 @@ export default function App() {
             </FormControl>
           </form>
         </Drawer>
-        <form onSubmit={handleSearchSubmit}>
-          <input type="text" placeholder="Search by card name" value={search} onChange={handleSearchChange}/>
-              <input type="submit" value="Search"/>
-        </form>
         {/* Cards */}
         <div className={classes.root}>
           {cards

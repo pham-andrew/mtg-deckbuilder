@@ -482,6 +482,7 @@ export default function App() {
           <Drawer anchor="right" open={openDeck} onClose={()=>{handleDeckClose(); setSaved(false)}}>
             <Collapse in={four}>
               <Alert
+                severity="error"
                 action={
                   <IconButton
                     color="inherit"

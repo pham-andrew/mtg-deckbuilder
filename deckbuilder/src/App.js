@@ -264,8 +264,6 @@ export default function App() {
     if(search !== ""){
       url = `https://api.magicthegathering.io/v1/cards?gameFormat=standard&name=${search}`
     }
-
-    console.log(url)
     let res = await fetch(url)
     let res2 = await fetch(`${url}&page=2`)
     let newCardsPg1 = await res.json()
@@ -293,7 +291,14 @@ export default function App() {
         for(var j=0;j<deck.length;j++)
           if(deck[i].card.name===deck[j].card.name){
             c[deck[i].card.name]=-~c[deck[i].card.name]
-            if(c[deck[i].card.name] > 4)
+            if(
+              c[deck[i].card.name] > 4
+              && deck[i].card.name !== "Plains" 
+              && deck[i].card.name !== "Mountain" 
+              && deck[i].card.name !== "Forest" 
+              && deck[i].card.name !== "Island" 
+              && deck[i].card.name !== "Swamp"
+            )
               setFour(true)
           }
     setOcc(c)

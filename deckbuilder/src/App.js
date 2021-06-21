@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
-import { Route, Link, Switch, Redirect } from 'react-router-dom'
-import About from './About'
 
+import { Route, Link } from 'react-router-dom'
+import About from './About'
 
 import { fade, makeStyles, withStyles, createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';

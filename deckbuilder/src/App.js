@@ -635,15 +635,13 @@ export default function App() {
                     <IconButton size="small" onClick={()=>setDeck([...deck,{card}])}><AddCircleOutlineIcon /></IconButton>
                   </Paper>
                 </Badge>
+                {/* Dialog */}
                 <Dialog onClose={()=>handleDialogClose(card.name)} open={dialog[card.name]}>
                   <DialogTitle onClose={()=>handleDialogClose(card.name)}>
                     {getNameLang(card)}
                   </DialogTitle>
                   <DialogContent dividers>
-                    <img src={getImgLangURL(card)} alt={card.name}/>
-                    <Typography gutterBottom>
-                      {getTextLang(card)}
-                    </Typography>
+                    <img src={getImgLangURL(card)} alt={card.name} style={{width: "300px"}}/>
                   </DialogContent>
                   <DialogActions>
                     <Button autoFocus onClick={()=>handleDialogClose(card.name)} color="primary">

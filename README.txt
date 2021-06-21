@@ -11,7 +11,7 @@ Primary Features:
 Requirements:
     Ideation
         1. Idea Approved
-        2. TODO Wireframe included in github wiki
+        2. Wireframe included in github wiki
         3. App solves a problem
     Group Requirements
         1. Idea approved by day 1

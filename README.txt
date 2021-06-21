@@ -10,5 +10,8 @@ Features:
 -load a deck
 -switch between languages
 
+Project Requirements Met:
+
+
 Notes:
 -Filters take a long time to load from API, wait for cards to finish loading
